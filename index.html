@@ -260,22 +260,22 @@ tbody tr:hover .ad-link { opacity: 1; }
 <body>
 
 <!-- CONFIG MODAL -->
-<!-- ===== MODAL CONFIG COMPLETO ===== -->
-<div id="configModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;overflow-y:auto;padding:20px;">
-  <div style="background:#1c1c28;border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:28px;width:100%;max-width:560px;position:relative;">
+<!-- ===== MODAL CONFIG ===== -->
+<div id="configModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#1c1c28;border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:28px;width:100%;max-width:520px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div style="font-size:17px;font-weight:600;">⚙️ Configurações do Dashboard</div>
-      <button onclick="document.getElementById('configModal').style.display='none'" style="background:transparent;border:none;color:#8888aa;font-size:18px;cursor:pointer;padding:4px;">✕</button>
+      <div style="font-size:17px;font-weight:600;">⚙️ Configurações</div>
+      <button onclick="document.getElementById('configModal').style.display='none'" style="background:transparent;border:none;color:#8888aa;font-size:18px;cursor:pointer;">✕</button>
     </div>
 
     <!-- STATUS -->
     <div id="configStatus" style="margin-bottom:20px;padding:12px;border-radius:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);font-size:12px;color:#8888aa;">
-      Verificando status...
+      Verificando...
     </div>
 
-    <!-- SEÇÃO 1: URL DO SCRIPT -->
+    <!-- URL DO SCRIPT -->
     <div style="margin-bottom:20px;">
-      <div style="font-size:12px;font-weight:600;color:#cccce8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">1. URL do Apps Script</div>
+      <div style="font-size:11px;font-weight:600;color:#cccce8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">URL do Apps Script (Web App)</div>
       <div style="font-size:11px;color:#6c6fff;background:rgba(108,111,255,0.08);border-radius:6px;padding:10px;margin-bottom:10px;line-height:1.6;">
         Apps Script → Implantar → Gerenciar implantações → copie a URL <strong>/exec</strong>
       </div>
@@ -288,44 +288,22 @@ tbody tr:hover .ad-link { opacity: 1; }
 
     <hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:0 0 20px;">
 
-    <!-- SEÇÃO 2: TOKEN META -->
+    <!-- ABA COMERCIAL -->
     <div style="margin-bottom:20px;">
-      <div style="font-size:12px;font-weight:600;color:#cccce8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">2. Token Meta (salvo no Apps Script)</div>
-      <div style="font-size:11px;color:#f5a623;background:rgba(245,166,35,0.08);border-radius:6px;padding:10px;margin-bottom:10px;line-height:1.6;">
-        ⚠️ O token precisa ser salvo no Apps Script.<br>
-        No editor do Apps Script, edite a função <strong>setupToken()</strong>, cole seu token e execute-a.<br>
-        Ou cole abaixo para salvar via dashboard:
-      </div>
-      <input id="configToken" type="password" placeholder="EAARxmUt4bAcBQgkDZBP9bsxJZCoU8jX60EpnbDmvON5elPvADLBP6gOGkeRUHDLRVvhNrIHF2ej74i7FQlCyU7YWgqM9Q8iwZCBiBZCB9KLisUq0L40NIYxfXuXfz8qt1ZCRjie2tYafH2NmrQk9XLdyoQuhJZA5M2w8GnQZAhijiAROADhgXxgMrsz5OSOsZCOZAE3x25F1BKbYT9hiBF1zk0yrOSskfkweZCSkuXvvdlvXBey3ZBB7PG7v9L5uDnxd4rtcZCcfgZAqCo1eUawjUXsNotcczpj8Dafh3QApZBe0ZCptHZAwLZCPisEBfXnUQYgxhtfZBF9oR9YJp6"
-        style="width:100%;padding:10px 12px;background:#111118;border:1px solid rgba(255,255,255,0.15);color:#f0f0f8;border-radius:8px;font-size:12px;font-family:monospace;outline:none;margin-bottom:8px;">
-      <button onclick="saveMetaToken()" style="width:100%;padding:9px;background:#1edb8c;color:#0a0a0f;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
-        🔑 Salvar Token no Apps Script
-      </button>
-      <div style="font-size:11px;color:#8888aa;margin-top:6px;">
-        Onde gerar o token: <a href="https://developers.facebook.com/tools/explorer/" target="_blank" style="color:#6c6fff;">Meta Graph Explorer</a> · permissões: ads_read, ads_management
-      </div>
-    </div>
-
-    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:0 0 20px;">
-
-    <!-- SEÇÃO 3: ABA COMERCIAL -->
-    <div style="margin-bottom:20px;">
-      <div style="font-size:12px;font-weight:600;color:#cccce8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">3. Aba da Planilha Comercial</div>
+      <div style="font-size:11px;font-weight:600;color:#cccce8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Aba da Planilha Comercial</div>
       <div style="display:flex;gap:8px;">
         <select id="sheetSelect" style="flex:1;padding:9px 12px;background:#111118;border:1px solid rgba(255,255,255,0.15);color:#f0f0f8;border-radius:8px;font-size:12px;font-family:inherit;outline:none;">
-          <option value="">Carregando abas...</option>
+          <option value="">Conecte o Apps Script primeiro...</option>
         </select>
-        <button onclick="saveSheet()" style="padding:9px 16px;background:#38bdf8;color:#0a0a0f;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">
-          Salvar
-        </button>
+        <button onclick="saveSheet()" style="padding:9px 16px;background:#38bdf8;color:#0a0a0f;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Salvar</button>
       </div>
     </div>
 
     <!-- DIAGNÓSTICO -->
-    <button onclick="runDiagnosis()" style="width:100%;padding:9px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#8888aa;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;">
-      🔍 Rodar Diagnóstico Completo
+    <button onclick="runDiagnosis()" style="width:100%;padding:9px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:#8888aa;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;">
+      🔍 Diagnóstico
     </button>
-    <div id="diagResult" style="display:none;margin-top:12px;padding:12px;background:rgba(0,0,0,0.3);border-radius:8px;font-size:11px;font-family:monospace;color:#8888aa;white-space:pre-wrap;max-height:200px;overflow-y:auto;"></div>
+    <div id="diagResult" style="display:none;margin-top:10px;padding:12px;background:rgba(0,0,0,0.3);border-radius:8px;font-size:11px;font-family:monospace;color:#8888aa;white-space:pre-wrap;max-height:180px;overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -447,21 +425,22 @@ tbody tr:hover .ad-link { opacity: 1; }
 
 <script>
 // ============================================================
-// ============================================================
-// CONFIG
+// CONFIG — Token está embutido no Code.gs (MktConnector)
+// Só precisa configurar a URL do Apps Script aqui
 // ============================================================
 let SCRIPT_URL = localStorage.getItem('meta_dash_url') || 'NOT_SET';
 
 function checkConfig() {
-  // Preenche URL salva no input
   const saved = localStorage.getItem('meta_dash_url');
-  if (saved) document.getElementById('configUrl').value = saved;
-
+  if (saved) {
+    document.getElementById('configUrl').value = saved;
+  }
   if (SCRIPT_URL === 'NOT_SET') {
     document.getElementById('configModal').style.display = 'flex';
+  } else {
+    loadConfigStatus();
     loadSheetOptions();
   }
-  loadConfigStatus();
 }
 
 function openConfig() {
@@ -480,34 +459,13 @@ function saveScriptUrl() {
   }
   localStorage.setItem('meta_dash_url', url);
   SCRIPT_URL = url;
-  showToast('URL salva!', 'success');
+  showToast('✅ URL salva!', 'success');
   loadConfigStatus();
   loadSheetOptions();
-  if (state.loaded === false) { loadAll(); setInterval(loadAll, 5 * 60 * 1000); }
-}
-
-async function saveMetaToken() {
-  const token = document.getElementById('configToken').value.trim();
-  if (!token || token.length < 20) {
-    showToast('Token muito curto ou vazio', 'error');
-    return;
-  }
-  if (SCRIPT_URL === 'NOT_SET') {
-    showToast('Configure a URL do Apps Script primeiro', 'error');
-    return;
-  }
-  try {
-    const r = await apiFetch('saveToken', { token });
-    if (r.valid) {
-      showToast('✅ Token salvo e validado! Conectado como: ' + (r.user || ''), 'success');
-      document.getElementById('configToken').value = '';
-      loadConfigStatus();
-      loadAll();
-    } else {
-      showToast('Token salvo mas inválido: ' + (r.error || ''), 'error');
-    }
-  } catch(e) {
-    showToast('Erro: ' + e.message, 'error');
+  document.getElementById('configModal').style.display = 'none';
+  if (!state.loaded) {
+    loadAll();
+    setInterval(loadAll, 5 * 60 * 1000);
   }
 }
 
@@ -515,25 +473,29 @@ async function loadConfigStatus() {
   const el = document.getElementById('configStatus');
   if (!el) return;
   if (SCRIPT_URL === 'NOT_SET') {
-    el.innerHTML = '⚠️ URL do Apps Script não configurada';
+    el.innerHTML = '⚠️ Cole a URL do Apps Script acima para começar';
     el.style.borderColor = 'rgba(245,166,35,0.4)';
     return;
   }
-  el.innerHTML = '⏳ Verificando conexão...';
+  el.innerHTML = '⏳ Verificando...';
   try {
     const s = await apiFetch('getStatus');
-    const tokenOk = s.meta_api_ok ? '✅' : '❌';
-    const tokenMsg = s.meta_api_ok
-      ? `Token OK · Conectado como <strong>${s.meta_user || 'N/A'}</strong>`
-      : `Token inválido: ${s.meta_error || 'erro desconhecido'}`;
+    const ok = s.meta_api_ok;
     el.innerHTML = `
-      <div style="margin-bottom:6px">🔗 Apps Script: <span style="color:#1edb8c">Conectado</span></div>
-      <div style="margin-bottom:4px">${tokenOk} Meta API: ${tokenMsg}</div>
-      <div>📋 Aba comercial: <strong>${s.sheet_name}</strong></div>
+      <div style="margin-bottom:5px">🔗 Apps Script: <span style="color:#1edb8c;font-weight:500">Conectado</span>
+        <span style="color:#5555aa;font-size:10px;margin-left:6px">${s.token_source || ''}</span>
+      </div>
+      <div style="margin-bottom:5px">${ok ? '✅' : '❌'} Meta API (MktConnector): 
+        <span style="color:${ok ? '#1edb8c' : '#ff5757'};font-weight:500">${ok ? 'OK — ' + (s.meta_user || '') : (s.meta_error || 'erro')}</span>
+      </div>
+      <div>📋 Aba comercial: <strong>${s.sheet_name}</strong>
+        ${s.sheets_available ? `<span style="color:#5555aa;font-size:10px"> · disponíveis: ${s.sheets_available.join(', ')}</span>` : ''}
+      </div>
     `;
-    el.style.borderColor = s.meta_api_ok ? 'rgba(30,219,140,0.3)' : 'rgba(255,87,87,0.3)';
+    el.style.borderColor = ok ? 'rgba(30,219,140,0.3)' : 'rgba(255,87,87,0.3)';
+    el.style.background = ok ? 'rgba(30,219,140,0.05)' : 'rgba(255,87,87,0.05)';
   } catch(e) {
-    el.innerHTML = '❌ Erro ao conectar com Apps Script: ' + e.message;
+    el.innerHTML = '❌ Não foi possível conectar: ' + e.message;
     el.style.borderColor = 'rgba(255,87,87,0.3)';
   }
 }
@@ -560,7 +522,7 @@ async function saveSheet() {
   try {
     await apiFetch('setSheet', { name });
     localStorage.setItem('meta_dash_sheetname', name);
-    showToast('Aba comercial: "' + name + '" configurada', 'success');
+    showToast('Aba "' + name + '" configurada', 'success');
     loadConfigStatus();
   } catch(e) {
     showToast('Erro: ' + e.message, 'error');
@@ -605,7 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
   checkConfig();
   if (SCRIPT_URL !== 'NOT_SET') {
     loadAll();
-    setInterval(loadAll, 5 * 60 * 1000);
+    setInterval(loadAll, 5 * 60 * 1000); // auto-refresh 5min
   }
 });
 
@@ -665,13 +627,14 @@ function setupFilters() {
 // ============================================================
 async function loadAll() {
   if (SCRIPT_URL === 'NOT_SET') {
-    showToast('Configure a URL do Apps Script primeiro', 'error');
+    showToast('Configure a URL do Apps Script primeiro — clique em ⚙️ Config', 'error');
+    openConfig();
     return;
   }
   setRefreshing(true);
   try {
-    const since = document.getElementById('filterSince').value;
-    const until = document.getElementById('filterUntil').value;
+    const since   = document.getElementById('filterSince').value;
+    const until   = document.getElementById('filterUntil').value;
     const account = document.getElementById('filterAccount').value;
 
     const [adsData, comercialData, creativesData] = await Promise.all([
@@ -680,57 +643,55 @@ async function loadAll() {
       apiFetch('getCreativesAnalysis', { since, until })
     ]);
 
-    // Token não configurado — abre config
-    if (adsData.error === 'TOKEN_NOT_SET') {
-      showToast('⚠️ Token Meta não configurado — veja as Configurações', 'error');
-      openConfig();
-      setRefreshing(false);
-      return;
+    // Erro de API Meta — mostra mas não trava
+    if (adsData.error && !adsData.ads) {
+      showToast('⚠️ Meta API: ' + adsData.error, 'error');
     }
 
-    state.ads = Array.isArray(adsData.ads) ? adsData.ads : [];
+    state.ads     = Array.isArray(adsData.ads) ? adsData.ads : [];
     state.summary = adsData.summary || {};
 
-    const rawComercial = (typeof comercialData === 'object' && comercialData !== null) ? comercialData : {};
+    const rc = (typeof comercialData === 'object' && comercialData) ? comercialData : {};
     state.comercial = {
-      ...rawComercial,
-      data: Array.isArray(rawComercial.data) ? rawComercial.data : [],
-      total_sales: Number(rawComercial.total_sales) || 0,
-      total_revenue: Number(rawComercial.total_revenue) || 0
+      ...rc,
+      data:          Array.isArray(rc.data) ? rc.data : [],
+      total_sales:   Number(rc.total_sales)   || 0,
+      total_revenue: Number(rc.total_revenue) || 0
     };
     state.creatives = Array.isArray(creativesData.creatives) ? creativesData.creatives : [];
     state.loaded = true;
 
-    // Mostra erros parciais sem travar
-    if (adsData.errors && adsData.errors.length > 0) {
-      console.warn('Erros parciais:', adsData.errors);
-    }
+    if (adsData.errors && adsData.errors.length > 0) console.warn('Erros parciais:', adsData.errors);
 
     renderAll();
     document.getElementById('lastUpdate').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
-    const adCount = state.ads.length;
-    showToast(adCount > 0 ? `${adCount} anúncios carregados` : 'Sem dados para o período', adCount > 0 ? 'success' : '');
-  } catch (err) {
-    console.error('loadAll error:', err);
-    if (err.message.includes('não configurada') || err.message.includes('NOT_SET')) {
-      openConfig();
-    } else {
-      showToast('Erro: ' + err.message, 'error');
-    }
+    const n = state.ads.length;
+    showToast(n > 0 ? `${n} anúncios carregados ✓` : 'Sem dados para o período selecionado', n > 0 ? 'success' : '');
+  } catch(err) {
+    console.error('loadAll:', err);
+    showToast('Erro: ' + err.message, 'error');
   }
   setRefreshing(false);
 }
 
 function apiFetch(action, params = {}) {
   if (SCRIPT_URL === 'NOT_SET') {
-    return Promise.reject(new Error('URL do Apps Script não configurada. Clique em Configurar.'));
+    return Promise.reject(new Error('URL do Apps Script não configurada'));
   }
   const qs = new URLSearchParams({ action, ...params }).toString();
   return fetch(`${SCRIPT_URL}?${qs}`)
     .then(r => {
+      // Apps Script às vezes retorna HTML de erro com 200 — verificamos content-type
       const ct = r.headers.get('content-type') || '';
-      if (!ct.includes('json')) throw new Error('Resposta inválida do servidor (não é JSON). Verifique se o Web App está publicado corretamente.');
+      if (!ct.includes('json')) {
+        throw new Error('O Apps Script retornou HTML em vez de JSON. Verifique: 1) Web App publicado como "Anyone" 2) Deploy atualizado após editar o código');
+      }
       return r.json();
+    })
+    .then(data => {
+      // Loga erros parciais mas não lança exceção — deixa o chamador decidir
+      if (data && data.error) console.warn(`apiFetch(${action}) error:`, data.error);
+      return data;
     })
     .catch(err => { throw new Error(err.message); });
 }
