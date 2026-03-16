@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SDA 2026 · Dashboard Perry Marketing</title>
+<title>SDA 2026 · Master Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#050A05;--sb:#0A120A;--c1:#0D170D;--bd:#1A381A;--n:#4AE54A;--r:#FF4444;--w:#FFF;--t2:#88A088;--t3:#506850}
+:root{--bg:#050A05;--sb:#0A120A;--c1:#0D170D;--bd:#1A381A;--n:#4AE54A;--r:#FF4444;--y:#FFD700;--b:#5BA8FF;--w:#FFF;--t2:#88A088;--t3:#506850}
 body{background:var(--bg);color:var(--w);font-family:'Sora',sans-serif;display:flex;height:100vh;overflow:hidden}
-.sidebar{width:240px;background:var(--sb);border-right:1px solid var(--bd);display:flex;flex-direction:column}
+.sidebar{width:220px;background:var(--sb);border-right:1px solid var(--bd);display:flex;flex-direction:column}
 .sb-logo{padding:20px;border-bottom:1px solid var(--bd);text-align:center}
-.sb-logo h2{font-size:14px;font-weight:800;color:var(--n);letter-spacing:1px}
+.sb-logo h2{font-size:14px;color:var(--n);letter-spacing:1px}
 .sb-item{padding:12px 20px;cursor:pointer;font-size:12px;color:var(--t2);display:flex;align-items:center;gap:10px}
 .sb-item.active{background:rgba(74,229,74,.08);color:var(--n);border-left:4px solid var(--n)}
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
@@ -22,15 +22,14 @@ body{background:var(--bg);color:var(--w);font-family:'Sora',sans-serif;display:f
 .acc-btn{padding:6px 12px;border-radius:6px;font-size:10px;font-weight:700;border:1px solid var(--bd);background:var(--c1);color:var(--t2);cursor:pointer}
 .acc-btn.on{background:var(--n);color:var(--bg);border-color:var(--n)}
 .content{padding:20px;flex:1}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
 .kpi{background:var(--c1);border:1px solid var(--bd);border-radius:10px;padding:16px;text-align:center}
 .kpi .label{font-size:9px;text-transform:uppercase;color:var(--t3);letter-spacing:1px}
-.kpi .value{font-size:22px;font-weight:800;margin-top:4px}
-.card{background:var(--c1);border:1px solid var(--bd);border-radius:12px;padding:20px}
+.kpi .value{font-size:20px;font-weight:800;margin-top:4px}
+.card{background:var(--c1);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:15px}
 table{width:100%;border-collapse:collapse;font-size:11px}
 th{text-align:left;padding:10px;color:var(--t3);border-bottom:2px solid var(--bd)}
 td{padding:12px 10px;border-bottom:1px solid var(--bd);color:var(--t2)}
-.error-msg{background:rgba(255,68,68,0.1);border:1px solid var(--r);color:var(--r);padding:15px;border-radius:8px;margin-bottom:20px}
 .status-tag{padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold}
 .status-ok{background:rgba(74,229,74,0.1);color:var(--n)}
 .status-err{background:rgba(255,68,68,0.1);color:var(--r)}
@@ -42,115 +41,107 @@ td{padding:12px 10px;border-bottom:1px solid var(--bd);color:var(--t2)}
 <script type="text/babel">
 const { useState, useEffect, useCallback } = React;
 
-// CONFIGURAÇÕES IMUTÁVEIS - PERRY MARKETING INTEGRADO
+// CONFIGS PERRY MARKETING
 const META_TOKEN = 'EAARxmUt4bAcBQgkDZBP9bsxJZCoU8jX60EpnbDmvON5elPvADLBP6gOGkeRUHDLRVvhNrIHF2ej74i7FQlCyU7YWgqM9Q8iwZCBiBZCB9KLisUq0L40NIYxfXuXfz8qt1ZCRjie2tYafH2NmrQk9XLdyoQuhJZA5M2w8GnQZAhijiAROADhgXxgMrsz5OSOsZCOZAE3x25F1BKbYT9hiBF1zk0yrOSskfkweZCSkuXvvdlvXBey3ZBB7PG7v9L5uDnxd4rtcZCcfgZAqCo1eUawjUXsNotcczpj8Dafh3QApZBe0ZCptHZAwLZCPisEBfXnUQYgxhtfZBF9oR9YJp6';
 const ACCOUNTS = { 'C04': 'act_377480853270622', 'C03': 'act_629328937757745' };
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwaX7X_BvH97Nlq1z9R1T9-1b9-1b9-1b9/exec'; // Cole a URL do seu Apps Script aqui
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTQXKC3SzTbVnFWu4RAZhtt_MDxwfes3EzGpQiXm9sVFpNXZYdCk9IXe3LRgt7lhjtZA/exec'; // SUA URL DO APPS SCRIPT
 
 function App() {
-    const [loading, setLoading] = useState(true);
-    const [metaError, setMetaError] = useState(null);
+    const [page, setPage] = useState('meta');
     const [account, setAccount] = useState('C04');
+    const [loading, setLoading] = useState(true);
     const [campaigns, setCampaigns] = useState([]);
     const [metaSummary, setMetaSummary] = useState(null);
+    const [sheetData, setSheetData] = useState(null);
 
+    // LOAD PLANILHA (JSONP)
+    const loadSheet = useCallback(() => {
+        const callbackName = 'callback_' + Math.round(100000 * Math.random());
+        window[callbackName] = (res) => {
+            if(res.success) setSheetData(res.data);
+            delete window[callbackName];
+        };
+        const script = document.createElement('script');
+        script.src = `${SCRIPT_URL}?action=all&callback=${callbackName}`;
+        document.head.appendChild(script);
+    }, []);
+
+    // LOAD META
     const loadMeta = useCallback(async () => {
         setLoading(true);
-        setMetaError(null);
         try {
             const accId = ACCOUNTS[account];
-            const baseUrl = `https://graph.facebook.com/v21.0/${accId}`;
-            
-            // Resumo
-            const resSum = await fetch(`${baseUrl}/insights?fields=spend,clicks,ctr&date_preset=this_month&access_token=${META_TOKEN}`);
+            const resSum = await fetch(`https://graph.facebook.com/v21.0/${accId}/insights?fields=spend,clicks,ctr&date_preset=this_month&access_token=${META_TOKEN}`);
             const dataSum = await resSum.json();
-            if (dataSum.error) throw new Error(`Meta: ${dataSum.error.message}`);
-            setMetaSummary(dataSum.data[0] || null);
+            setMetaSummary(dataSum.data?.[0] || null);
 
-            // Campanhas
-            const resCamp = await fetch(`${baseUrl}/campaigns?fields=name,status,objective&limit=15&access_token=${META_TOKEN}`);
+            const resCamp = await fetch(`https://graph.facebook.com/v21.0/${accId}/campaigns?fields=name,status&limit=10&access_token=${META_TOKEN}`);
             const dataCamp = await resCamp.json();
-            if (dataCamp.error) throw new Error(`Meta: ${dataCamp.error.message}`);
-
-            const enriched = await Promise.all(dataCamp.data.map(async (c) => {
-                const resIns = await fetch(`https://graph.facebook.com/v21.0/${c.id}/insights?fields=spend,clicks&date_preset=this_month&access_token=${META_TOKEN}`);
-                const dataIns = await resIns.json();
-                return { ...c, insights: dataIns.data?.[0] || null };
-            }));
-            setCampaigns(enriched);
-
-        } catch (e) {
-            setMetaError(e.message);
-        } finally {
-            setLoading(false);
-        }
+            setCampaigns(dataCamp.data || []);
+        } catch (e) { console.error(e); }
+        setLoading(false);
     }, [account]);
 
-    useEffect(() => { loadMeta(); }, [loadMeta]);
+    useEffect(() => { loadMeta(); loadSheet(); }, [loadMeta, loadSheet]);
 
     return (
         <>
             <div className="sidebar">
                 <div className="sb-logo"><h2>SDA 2026</h2></div>
-                <div className="sb-item active">📊 Performance Meta</div>
-                <div className="sb-item">💰 Vendas Reais</div>
-                <div style={{marginTop:'auto', padding:'20px', fontSize:'10px', color:'var(--t3)'}}>
-                    Petterson Perry<br/>CEO Perry Marketing
-                </div>
+                <div className={`sb-item ${page==='meta'?'active':''}`} onClick={()=>setPage('meta')}>📊 Tráfego Pago</div>
+                <div className={`sb-item ${page==='comercial'?'active':''}`} onClick={()=>setPage('comercial')}>💰 Comercial</div>
             </div>
 
             <div className="main">
                 <div className="topbar">
-                    {Object.keys(ACCOUNTS).map(a => (
-                        <button key={a} className={`acc-btn ${account === a ? 'on' : ''}`} onClick={() => setAccount(a)}>{a}</button>
-                    ))}
-                    <span className={`status-tag ${metaError ? 'status-err' : 'status-ok'}`}>
-                        {metaError ? '❌ API Erro' : '✅ API Online'}
-                    </span>
-                    <button className="acc-btn" onClick={loadMeta} style={{marginLeft:'auto', color:'var(--n)'}}>🔄 Atualizar</button>
+                    <div style={{display:'flex', gap:'8px'}}>
+                        {Object.keys(ACCOUNTS).map(a => (
+                            <button key={a} className={`acc-btn ${account === a ? 'on' : ''}`} onClick={() => setAccount(a)}>{a}</button>
+                        ))}
+                    </div>
+                    <button className="acc-btn" onClick={()=>{loadMeta();loadSheet();}} style={{marginLeft:'auto', color:'var(--n)'}}>🔄 Atualizar Tudo</button>
                 </div>
 
                 <div className="content">
-                    {metaError && (
-                        <div className="error-msg">
-                            <strong>Atenção:</strong> {metaError}<br/>
-                            <small>Se o token é ilimitado e caiu, verifique se o App está em modo "Live" no Facebook Developers.</small>
-                        </div>
+                    {page === 'meta' && (
+                        <>
+                            <div className="kpis">
+                                <div className="kpi"><div className="label">Gasto Meta</div><div className="value" style={{color:'var(--r)'}}>R$ {parseFloat(metaSummary?.spend || 0).toLocaleString('pt-BR')}</div></div>
+                                <div className="kpi"><div className="label">Faturamento Real</div><div className="value" style={{color:'var(--n)'}}>R$ {sheetData?.resumo?.totalReceita?.toLocaleString('pt-BR') || '0,00'}</div></div>
+                                <div className="kpi"><div className="label">ROAS Atual</div><div className="value" style={{color:'var(--y)'}}>{metaSummary?.spend > 0 ? (sheetData?.resumo?.totalReceita / metaSummary.spend).toFixed(2) : '0'}x</div></div>
+                            </div>
+                            <div className="card">
+                                <table>
+                                    <thead><tr><th>Campanha</th><th>Status</th></tr></thead>
+                                    <tbody>
+                                        {campaigns.map(c => (
+                                            <tr key={c.id}><td>{c.name}</td><td>{c.status==='ACTIVE'?'🟢':'⚪'}</td></tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
                     )}
 
-                    <div className="kpis">
-                        <div className="kpi">
-                            <div className="label">Investimento (Mês Atual)</div>
-                            <div className="value" style={{color:'var(--r)'}}>R$ {parseFloat(metaSummary?.spend || 0).toLocaleString('pt-BR')}</div>
-                        </div>
-                        <div className="kpi">
-                            <div className="label">Cliques</div>
-                            <div className="value">{metaSummary?.clicks || 0}</div>
-                        </div>
-                        <div className="kpi">
-                            <div className="label">CTR Médio</div>
-                            <div className="value" style={{color:'var(--n)'}}>{parseFloat(metaSummary?.ctr || 0).toFixed(2)}%</div>
-                        </div>
-                    </div>
-
-                    <div className="card">
-                        <h3 style={{fontSize:'12px', color:'var(--n)', marginBottom:'15px'}}>Campanhas Ativas</h3>
-                        <table>
-                          <thead>
-                            <tr><th>Nome</th><th>Status</th><th>Investido</th><th>Cliques</th></tr>
-                          </thead>
-                          <tbody>
-                            {campaigns.map(c => (
-                              <tr key={c.id}>
-                                <td style={{color:'var(--w)'}}>{c.name}</td>
-                                <td>{c.status === 'ACTIVE' ? '🟢' : '⚪'}</td>
-                                <td>R$ {parseFloat(c.insights?.spend || 0).toFixed(2)}</td>
-                                <td>{c.insights?.clicks || 0}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                    </div>
+                    {page === 'comercial' && sheetData && (
+                        <>
+                            <div className="kpis">
+                                <div className="kpi"><div className="label">Total Vendas</div><div className="value">{sheetData.resumo.totalVendas}</div></div>
+                                <div className="kpi"><div className="label">Ticket Médio</div><div className="value">R$ {sheetData.resumo.ticketMedio}</div></div>
+                            </div>
+                            <div className="card">
+                                <h3 style={{fontSize:'12px', color:'var(--n)', marginBottom:'10px'}}>Top Closers</h3>
+                                <table>
+                                    <thead><tr><th>Nome</th><th>Vendas</th><th>Receita</th></tr></thead>
+                                    <tbody>
+                                        {sheetData.closers.map((cl, i) => (
+                                            <tr key={i}><td>{cl.nome}</td><td>{cl.vendas}</td><td>R$ {cl.receita}</td></tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </>
