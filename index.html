@@ -4,326 +4,228 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meta Ads Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
 <style>
 :root {
-  --bg: #0a0a0f;
-  --bg2: #111118;
-  --bg3: #16161f;
-  --surface: #1c1c28;
-  --surface2: #22222f;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.12);
-  --text: #f0f0f8;
-  --text2: #8888aa;
-  --text3: #5555770;
-  --accent: #6c6fff;
-  --accent2: #9d9bff;
-  --green: #1edb8c;
-  --green2: #0fa86b;
-  --amber: #f5a623;
-  --red: #ff5757;
-  --purple: #c084fc;
-  --blue: #38bdf8;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --bg:      #09090f; --bg2: #0f0f18; --bg3: #141420;
+  --surf:    #1a1a26; --surf2: #20202e;
+  --brd:     rgba(255,255,255,0.07); --brd2: rgba(255,255,255,0.13);
+  --txt:     #eeeef8; --txt2: #7878a0; --txt3: #44445a;
+  --acc:     #6c6fff; --acc2: #9b9aff;
+  --grn:     #1dda8a; --amb: #f5a623; --red: #ff5252;
+  --blu:     #38bdf8; --pur: #c084fc;
+  --r:       12px;    --rs: 8px;
 }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);font-size:14px;line-height:1.5}
+.app{display:flex;flex-direction:column;min-height:100vh}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; }
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:54px;background:var(--bg2);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-dot{width:26px;height:26px;background:var(--acc);border-radius:7px;display:grid;place-items:center}
+.logo-dot svg{width:14px;height:14px;fill:#fff}
+.logo-name{font-size:14px;font-weight:600;letter-spacing:-.02em}
+.logo-sub{font-size:11px;color:var(--txt2)}
+.hd-right{display:flex;align-items:center;gap:10px}
+.live-pill{display:flex;align-items:center;gap:5px;background:rgba(29,218,138,0.1);border:1px solid rgba(29,218,138,0.25);border-radius:20px;padding:3px 9px;font-size:11px;color:var(--grn);font-weight:500}
+.live-dot{width:6px;height:6px;background:var(--grn);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.upd{font-size:11px;color:var(--txt2)}
+.btn-cfg{background:transparent;border:1px solid var(--brd2);color:var(--txt2);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-cfg:hover{color:var(--txt);border-color:var(--acc)}
 
-/* ===== LAYOUT ===== */
-.app { display: flex; flex-direction: column; min-height: 100vh; }
+/* TABS */
+.tabs{display:flex;gap:2px;padding:0 24px;background:var(--bg2);border-bottom:1px solid var(--brd)}
+.tab{padding:11px 16px;font-size:13px;font-weight:500;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.tab:hover{color:var(--txt)}
+.tab.active{color:var(--acc2);border-bottom-color:var(--acc)}
 
-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 28px; height: 56px;
-  background: var(--bg2); border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 100;
-}
-.logo { display: flex; align-items: center; gap: 10px; }
-.logo-icon { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
-.logo-icon svg { width: 16px; height: 16px; fill: white; }
-.logo-text { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
-.logo-sub { font-size: 11px; color: var(--text2); font-weight: 400; }
+/* FILTROS */
+.filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 24px;background:var(--bg2);border-bottom:1px solid var(--brd)}
+.fl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+select,input[type=date]{background:var(--surf);border:1px solid var(--brd2);color:var(--txt);padding:6px 10px;border-radius:var(--rs);font-size:12px;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s}
+select:hover,input[type=date]:hover,select:focus,input[type=date]:focus{border-color:var(--acc)}
+.dr{display:flex;align-items:center;gap:6px}
+.ds{font-size:10px;color:var(--txt2)}
+.btn-ref{margin-left:auto;display:flex;align-items:center;gap:6px;background:var(--acc);color:#fff;border:none;border-radius:var(--rs);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-ref:hover{background:var(--acc2);transform:translateY(-1px)}
+.btn-ref svg{width:13px;height:13px;fill:currentColor}
+.spin{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-.header-right { display: flex; align-items: center; gap: 12px; }
-.live-badge { display: flex; align-items: center; gap: 6px; background: rgba(30,219,140,0.1); border: 1px solid rgba(30,219,140,0.25); border-radius: 20px; padding: 4px 10px; font-size: 11px; color: var(--green); font-weight: 500; }
-.live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+/* CONTENT */
+.content{flex:1;padding:22px 24px}
+.pane{display:none}.pane.active{display:block}
 
-.last-update { font-size: 11px; color: var(--text2); }
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:22px}
+.card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.card.grn::before{background:var(--grn)}.card.acc::before{background:var(--acc)}
+.card.amb::before{background:var(--amb)}.card.blu::before{background:var(--blu)}
+.card.pur::before{background:var(--pur)}.card.red::before{background:var(--red)}
+.c-lbl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.c-val{font-size:21px;font-weight:600;letter-spacing:-.03em;line-height:1;margin-bottom:3px}
+.c-sub{font-size:11px;color:var(--txt2)}
+.c-sub.ok{color:var(--grn)}.c-sub.warn{color:var(--amb)}
 
-/* ===== TABS ===== */
-.tabs { display: flex; gap: 2px; padding: 0 28px; background: var(--bg2); border-bottom: 1px solid var(--border); }
-.tab { padding: 12px 18px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
-.tab:hover { color: var(--text); }
-.tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
+/* CHARTS */
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.chart-box{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:18px}
+.chart-lbl{font-size:11px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px}
+.chart-wrap{position:relative;height:190px}
 
-/* ===== FILTERS ===== */
-.filters {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  padding: 14px 28px; background: var(--bg2); border-bottom: 1px solid var(--border);
-}
-.filter-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
-select, input[type=date] {
-  background: var(--surface); border: 1px solid var(--border2); color: var(--text);
-  padding: 6px 12px; border-radius: var(--radius-sm); font-size: 12px; font-family: inherit;
-  outline: none; cursor: pointer; transition: border-color 0.2s;
-}
-select:hover, input[type=date]:hover { border-color: var(--accent); }
-.date-range { display: flex; align-items: center; gap: 6px; }
-.date-sep { color: var(--text2); font-size: 11px; }
-.btn-refresh {
-  margin-left: auto; display: flex; align-items: center; gap: 6px;
-  background: var(--accent); color: white; border: none; border-radius: var(--radius-sm);
-  padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
-  font-family: inherit;
-}
-.btn-refresh:hover { background: var(--accent2); transform: translateY(-1px); }
-.btn-refresh svg { width: 13px; height: 13px; }
-.spin { animation: spin 1s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* TABELA */
+.tbl-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.tbl-title{font-size:13px;font-weight:600}
+.tbl-ct{font-size:11px;color:var(--txt2)}
+.sort-bar{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.sort-lbl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em}
+.sbtn{padding:4px 10px;border-radius:6px;border:1px solid var(--brd);background:transparent;color:var(--txt2);font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
+.sbtn:hover,.sbtn.on{background:var(--surf2);color:var(--txt);border-color:var(--brd2)}
+.sbtn.on{color:var(--acc2);border-color:var(--acc)}
+.tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--brd)}
+table{width:100%;border-collapse:collapse;min-width:860px}
+thead th{background:var(--bg3);padding:9px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);white-space:nowrap;border-bottom:1px solid var(--brd)}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--brd);vertical-align:middle;font-size:12px}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--surf2)}
+tbody tr:hover .ad-link{opacity:1}
+.ad-wrap{display:flex;align-items:center;gap:9px}
+.thumb{width:38px;height:38px;border-radius:6px;object-fit:cover;background:var(--surf2);flex-shrink:0}
+.thumb-ph{width:38px;height:38px;border-radius:6px;background:var(--surf2);display:grid;place-items:center;flex-shrink:0;font-size:16px}
+.ad-nm{font-weight:500;font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ad-camp{font-size:10px;color:var(--txt2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ad-link{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--acc2);text-decoration:none;opacity:0;transition:opacity .15s;background:rgba(108,111,255,0.08);padding:1px 6px;border-radius:3px;margin-top:2px}
+.ad-link:hover{opacity:1;background:rgba(108,111,255,0.18)}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
+.st-ACTIVE{background:rgba(29,218,138,.1);color:var(--grn)}
+.st-PAUSED,.st-CAMPAIGN_PAUSED,.st-ADSET_PAUSED{background:rgba(245,166,35,.1);color:var(--amb)}
+.st-DISAPPROVED,.st-WITH_ISSUES{background:rgba(255,82,82,.1);color:var(--red)}
+.lote-b{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;background:rgba(108,111,255,0.1);color:var(--acc2)}
+.ct-03{background:rgba(56,189,248,.1);color:var(--blu)}
+.ct-04{background:rgba(192,132,252,.1);color:var(--pur)}
+.mono{font-family:'DM Mono',monospace;font-size:11px}
+.ok{color:var(--grn)}.warn{color:var(--amb)}.bad{color:var(--red)}.muted{color:var(--txt2)}
+.attr-b{display:flex;flex-direction:column;gap:2px}
+.attr-r{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--txt2);font-family:'DM Mono',monospace}
+.attr-l{font-size:9px;background:var(--surf2);padding:1px 4px;border-radius:3px}
 
-/* ===== MAIN CONTENT ===== */
-.content { flex: 1; padding: 24px 28px; }
-.tab-pane { display: none; }
-.tab-pane.active { display: block; }
+/* CRIATIVOS */
+.cri-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.cri-card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;transition:all .2s;cursor:pointer}
+.cri-card:hover{border-color:var(--brd2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.cri-img{position:relative;height:150px;background:var(--bg3)}
+.cri-img img{width:100%;height:100%;object-fit:cover}
+.cri-img-ph{width:100%;height:100%;display:grid;place-items:center;font-size:28px;color:var(--txt2)}
+.sc-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.75);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace}
+.sc-hi{color:var(--grn)}.sc-md{color:var(--amb)}.sc-lo{color:var(--red)}
+.cri-body{padding:13px}
+.cri-nome{font-weight:600;font-size:12px;margin-bottom:9px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cri-met{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.cm-v{font-size:14px;font-weight:600;font-family:'DM Mono',monospace}
+.cm-l{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.04em}
+.cri-ins{border-top:1px solid var(--brd);padding-top:9px}
+.ci{font-size:11px;color:var(--txt2);margin-bottom:3px;line-height:1.4}
+.cri-links{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.cri-lnk{font-size:10px;color:var(--acc2);text-decoration:none;background:rgba(108,111,255,.1);padding:2px 8px;border-radius:4px}
+.cri-lnk:hover{background:rgba(108,111,255,.2)}
 
-/* ===== SUMMARY CARDS ===== */
-.summary-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;
-  margin-bottom: 24px;
-}
-.metric-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 16px 18px; position: relative; overflow: hidden; transition: border-color 0.2s;
-}
-.metric-card:hover { border-color: var(--border2); }
-.metric-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
-.metric-card.green::before { background: var(--green); }
-.metric-card.accent::before { background: var(--accent); }
-.metric-card.amber::before { background: var(--amber); }
-.metric-card.blue::before { background: var(--blue); }
-.metric-card.purple::before { background: var(--purple); }
-.metric-card.red::before { background: var(--red); }
-.metric-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
-.metric-val { font-size: 22px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px; }
-.metric-sub { font-size: 11px; color: var(--text2); }
-.metric-sub.positive { color: var(--green); }
-.metric-sub.negative { color: var(--red); }
+/* COMERCIAL */
+.com-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
 
-/* ===== CHARTS ROW ===== */
-.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-.chart-title { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; }
-.chart-wrap { position: relative; height: 200px; }
+/* ESTADOS */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px}
+.spinner{width:32px;height:32px;border:3px solid var(--brd);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}
+.lt{font-size:12px;color:var(--txt2)}
+.empty{text-align:center;padding:60px 20px;color:var(--txt2)}
+.empty-ic{font-size:34px;margin-bottom:8px}
 
-/* ===== ADS TABLE ===== */
-.table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.table-title { font-size: 14px; font-weight: 600; }
-.table-count { font-size: 12px; color: var(--text2); }
+/* MODAL CONFIG */
+#cfg-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:20px}
+.cfg-box{background:var(--surf);border:1px solid var(--brd2);border-radius:16px;padding:26px;width:100%;max-width:500px}
+.cfg-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.cfg-title{font-size:16px;font-weight:600}
+.cfg-x{background:transparent;border:none;color:var(--txt2);font-size:18px;cursor:pointer}
+.cfg-status{margin-bottom:18px;padding:11px;border-radius:8px;background:rgba(0,0,0,.3);border:1px solid var(--brd);font-size:12px;color:var(--txt2);line-height:1.7}
+.cfg-sec{margin-bottom:18px}
+.cfg-lbl{font-size:10px;font-weight:600;color:var(--txt);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+.cfg-hint{font-size:11px;color:var(--acc);background:rgba(108,111,255,.08);border-radius:6px;padding:9px;margin-bottom:8px;line-height:1.6}
+.cfg-inp{width:100%;padding:9px 11px;background:#0d0d18;border:1px solid var(--brd2);color:var(--txt);border-radius:8px;font-size:12px;font-family:monospace;outline:none;margin-bottom:7px}
+.cfg-inp:focus{border-color:var(--acc)}
+.cfg-btn{width:100%;padding:9px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.cfg-btn.acc{background:var(--acc);color:#fff}.cfg-btn.acc:hover{background:var(--acc2)}
+.cfg-btn.teal{background:var(--grn);color:#0a0a0f}.cfg-btn.teal:hover{opacity:.9}
+.cfg-btn.ghost{background:transparent;border:1px solid var(--brd);color:var(--txt2)}.cfg-btn.ghost:hover{color:var(--txt);border-color:var(--brd2)}
+.cfg-row{display:flex;gap:7px}
+.cfg-row select{flex:1}
+.cfg-row .cfg-btn{width:auto;padding:9px 14px}
+.cfg-diag{display:none;margin-top:10px;padding:11px;background:rgba(0,0,0,.3);border-radius:8px;font-size:11px;font-family:monospace;color:var(--txt2);white-space:pre-wrap;max-height:160px;overflow-y:auto}
+hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
 
-.sort-bar { display: flex; gap: 6px; margin-bottom: 12px; }
-.sort-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 11px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
-.sort-btn:hover, .sort-btn.active { background: var(--surface2); color: var(--text); border-color: var(--border2); }
-.sort-label { font-size: 11px; color: var(--text2); margin-right: 4px; }
+/* TOAST */
+.toast{position:fixed;bottom:18px;right:18px;z-index:9999;background:var(--surf);border:1px solid var(--brd2);border-radius:var(--rs);padding:9px 14px;font-size:13px;transform:translateY(80px);opacity:0;transition:all .3s;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:var(--grn)}.toast.err{border-color:var(--red)}
 
-.ads-table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
-table { width: 100%; border-collapse: collapse; min-width: 900px; }
-thead th {
-  background: var(--bg3); padding: 10px 14px; text-align: left;
-  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
-  color: var(--text2); white-space: nowrap; position: sticky; top: 0;
-  border-bottom: 1px solid var(--border);
-}
-thead th.sortable { cursor: pointer; user-select: none; }
-thead th.sortable:hover { color: var(--text); }
-thead th.sorted { color: var(--accent2); }
-tbody td {
-  padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle;
-  font-size: 13px;
-}
-tbody tr:last-child td { border-bottom: none; }
-tbody tr { transition: background 0.15s; }
-tbody tr:hover td { background: var(--surface2); }
-tbody tr:hover .ad-link { opacity: 1; }
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surf2);border-radius:3px}
 
-.ad-thumb {
-  width: 40px; height: 40px; border-radius: 6px; object-fit: cover;
-  background: var(--surface2); flex-shrink: 0;
-}
-.ad-thumb-placeholder {
-  width: 40px; height: 40px; border-radius: 6px; background: var(--surface2);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.ad-info { display: flex; align-items: center; gap: 10px; }
-.ad-name { font-weight: 500; font-size: 13px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ad-campaign { font-size: 11px; color: var(--text2); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ad-link {
-  display: inline-flex; align-items: center; gap: 3px; font-size: 10px;
-  color: var(--accent2); text-decoration: none; opacity: 0; transition: opacity 0.2s;
-  background: rgba(108,111,255,0.1); padding: 2px 6px; border-radius: 4px; margin-top: 2px;
-}
-.ad-link:hover { opacity: 1 !important; background: rgba(108,111,255,0.2); }
-
-.status-badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; }
-.status-ACTIVE { background: rgba(30,219,140,0.1); color: var(--green); }
-.status-PAUSED, .status-CAMPAIGN_PAUSED { background: rgba(245,166,35,0.1); color: var(--amber); }
-.status-DISAPPROVED { background: rgba(255,87,87,0.1); color: var(--red); }
-
-.lote-badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 500; background: rgba(108,111,255,0.12); color: var(--accent2); }
-.account-badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 500; }
-.account-03 { background: rgba(56,189,248,0.1); color: var(--blue); }
-.account-04 { background: rgba(192,132,252,0.1); color: var(--purple); }
-
-.num { font-family: 'DM Mono', monospace; font-size: 12px; }
-.num.green { color: var(--green); }
-.num.amber { color: var(--amber); }
-.num.red { color: var(--red); }
-.num.accent { color: var(--accent2); }
-
-.attr-mini { display: flex; flex-direction: column; gap: 2px; }
-.attr-row { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text2); font-family: 'DM Mono', monospace; }
-.attr-label { font-size: 9px; background: var(--surface2); padding: 1px 4px; border-radius: 3px; color: var(--text2); }
-
-/* ===== CREATIVES TAB ===== */
-.creatives-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
-.creative-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  overflow: hidden; transition: all 0.2s; cursor: pointer;
-}
-.creative-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: var(--shadow); }
-.creative-thumb-wrap { position: relative; height: 160px; background: var(--bg3); }
-.creative-thumb { width: 100%; height: 100%; object-fit: cover; }
-.creative-thumb-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text2); font-size: 32px; }
-.score-badge {
-  position: absolute; top: 10px; right: 10px;
-  background: rgba(0,0,0,0.7); border-radius: 6px; padding: 3px 8px;
-  font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace;
-}
-.score-badge.high { color: var(--green); }
-.score-badge.mid { color: var(--amber); }
-.score-badge.low { color: var(--red); }
-
-.creative-body { padding: 14px; }
-.creative-name { font-weight: 600; font-size: 13px; margin-bottom: 10px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.creative-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-.c-metric { text-align: center; }
-.c-metric-val { font-size: 15px; font-weight: 600; font-family: 'DM Mono', monospace; }
-.c-metric-label { font-size: 9px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; }
-.creative-insights { border-top: 1px solid var(--border); padding-top: 10px; }
-.creative-insight { font-size: 11px; color: var(--text2); margin-bottom: 4px; line-height: 1.4; }
-.creative-links { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-.creative-link { font-size: 10px; color: var(--accent2); text-decoration: none; background: rgba(108,111,255,0.1); padding: 3px 8px; border-radius: 4px; }
-.creative-link:hover { background: rgba(108,111,255,0.2); }
-
-/* ===== LOADING / EMPTY ===== */
-.loading-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 14px; }
-.loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-.loading-text { font-size: 13px; color: var(--text2); }
-.empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
-.empty-icon { font-size: 36px; margin-bottom: 10px; }
-
-/* ===== COMERCIAL TABLE ===== */
-.comercial-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-
-/* ===== SCROLLBAR ===== */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
-
-/* ===== TOAST ===== */
-.toast {
-  position: fixed; bottom: 20px; right: 20px; z-index: 9999;
-  background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm);
-  padding: 10px 16px; font-size: 13px; color: var(--text);
-  transform: translateY(100px); opacity: 0; transition: all 0.3s;
-  box-shadow: var(--shadow);
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast.success { border-color: var(--green); }
-.toast.error { border-color: var(--red); }
-
-@media (max-width: 768px) {
-  .charts-row { grid-template-columns: 1fr; }
-  .summary-grid { grid-template-columns: repeat(2, 1fr); }
-  .creatives-grid { grid-template-columns: 1fr; }
-  .comercial-summary { grid-template-columns: 1fr 1fr; }
+@media(max-width:768px){
+  .charts{grid-template-columns:1fr}
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .com-cards{grid-template-columns:1fr 1fr}
+  .cri-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
+<div class="app">
 
-<!-- CONFIG MODAL -->
-<!-- ===== MODAL CONFIG ===== -->
-<div id="configModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;padding:20px;">
-  <div style="background:#1c1c28;border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:28px;width:100%;max-width:520px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div style="font-size:17px;font-weight:600;">⚙️ Configurações</div>
-      <button onclick="document.getElementById('configModal').style.display='none'" style="background:transparent;border:none;color:#8888aa;font-size:18px;cursor:pointer;">✕</button>
+<!-- MODAL CONFIG -->
+<div id="cfg-modal">
+  <div class="cfg-box">
+    <div class="cfg-hd">
+      <div class="cfg-title">⚙️ Configurações</div>
+      <button class="cfg-x" onclick="fechaConfig()">✕</button>
+    </div>
+    <div class="cfg-status" id="cfg-status">Verificando…</div>
+
+    <div class="cfg-sec">
+      <div class="cfg-lbl">URL do Apps Script (Web App)</div>
+      <div class="cfg-hint">Apps Script → Implantar → Gerenciar → copie a URL <strong>/exec</strong></div>
+      <input id="cfg-url" class="cfg-inp" type="url" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+      <button class="cfg-btn acc" onclick="salvaUrl()">💾 Salvar URL e Conectar</button>
     </div>
 
-    <!-- STATUS -->
-    <div id="configStatus" style="margin-bottom:20px;padding:12px;border-radius:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);font-size:12px;color:#8888aa;">
-      Verificando...
-    </div>
+    <hr class="cfg-sep">
 
-    <!-- URL DO SCRIPT -->
-    <div style="margin-bottom:20px;">
-      <div style="font-size:11px;font-weight:600;color:#cccce8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">URL do Apps Script (Web App)</div>
-      <div style="font-size:11px;color:#6c6fff;background:rgba(108,111,255,0.08);border-radius:6px;padding:10px;margin-bottom:10px;line-height:1.6;">
-        Apps Script → Implantar → Gerenciar implantações → copie a URL <strong>/exec</strong>
-      </div>
-      <input id="configUrl" type="url" placeholder="https://script.google.com/macros/s/AKfycb.../exec"
-        style="width:100%;padding:10px 12px;background:#111118;border:1px solid rgba(255,255,255,0.15);color:#f0f0f8;border-radius:8px;font-size:12px;font-family:monospace;outline:none;margin-bottom:8px;">
-      <button onclick="saveScriptUrl()" style="width:100%;padding:9px;background:#6c6fff;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
-        💾 Salvar URL
-      </button>
-    </div>
-
-    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:0 0 20px;">
-
-    <!-- ABA COMERCIAL -->
-    <div style="margin-bottom:20px;">
-      <div style="font-size:11px;font-weight:600;color:#cccce8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Aba da Planilha Comercial</div>
-      <div style="display:flex;gap:8px;">
-        <select id="sheetSelect" style="flex:1;padding:9px 12px;background:#111118;border:1px solid rgba(255,255,255,0.15);color:#f0f0f8;border-radius:8px;font-size:12px;font-family:inherit;outline:none;">
-          <option value="">Conecte o Apps Script primeiro...</option>
-        </select>
-        <button onclick="saveSheet()" style="padding:9px 16px;background:#38bdf8;color:#0a0a0f;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Salvar</button>
+    <div class="cfg-sec">
+      <div class="cfg-lbl">Aba da Planilha Comercial</div>
+      <div class="cfg-row">
+        <select id="cfg-sheets"><option value="">Conecte primeiro…</option></select>
+        <button class="cfg-btn teal" onclick="salvaAba()">Salvar</button>
       </div>
     </div>
 
-    <!-- DIAGNÓSTICO -->
-    <button onclick="runDiagnosis()" style="width:100%;padding:9px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:#8888aa;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;">
-      🔍 Diagnóstico
-    </button>
-    <div id="diagResult" style="display:none;margin-top:10px;padding:12px;background:rgba(0,0,0,0.3);border-radius:8px;font-size:11px;font-family:monospace;color:#8888aa;white-space:pre-wrap;max-height:180px;overflow-y:auto;"></div>
+    <button class="cfg-btn ghost" onclick="roda_diag()" style="margin-top:4px">🔍 Diagnóstico</button>
+    <div class="cfg-diag" id="cfg-diag"></div>
   </div>
 </div>
-
-<div class="app">
 
 <!-- HEADER -->
 <header>
   <div class="logo">
-    <div class="logo-icon">
-      <svg viewBox="0 0 16 16"><path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z"/><path d="M6.5 5.5L11 8l-4.5 2.5v-5z"/></svg>
-    </div>
-    <div>
-      <div class="logo-text">Meta Ads Dashboard</div>
-      <div class="logo-sub">Contas 03 + 04 · Realtime</div>
-    </div>
+    <div class="logo-dot"><svg viewBox="0 0 16 16"><path d="M8 1.5a6.5 6.5 0 100 13A6.5 6.5 0 008 1.5zM0 8a8 8 0 1116 0A8 8 0 010 8z"/><path d="M6.5 5.5L11 8l-4.5 2.5v-5z"/></svg></div>
+    <div><div class="logo-name">Meta Ads Dashboard</div><div class="logo-sub">Contas 03 + 04 · Realtime</div></div>
   </div>
-  <div class="header-right">
-    <div class="live-badge"><div class="live-dot"></div>Live</div>
-    <div class="last-update" id="lastUpdate">Aguardando dados…</div>
-    <button onclick="openConfig()" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:#8888aa;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit;">⚙️ Config</button>
+  <div class="hd-right">
+    <div class="live-pill"><div class="live-dot"></div>Live</div>
+    <div class="upd" id="upd-txt">Aguardando…</div>
+    <button class="btn-cfg" onclick="abreConfig()">⚙️ Config</button>
   </div>
 </header>
 
@@ -332,794 +234,603 @@ tbody tr:hover .ad-link { opacity: 1; }
   <div class="tab active" data-tab="overview">Visão Geral</div>
   <div class="tab" data-tab="ads">Anúncios</div>
   <div class="tab" data-tab="comercial">Comercial</div>
-  <div class="tab" data-tab="creatives">Análise de Criativos</div>
+  <div class="tab" data-tab="criativos">Análise de Criativos</div>
 </div>
 
-<!-- FILTERS -->
+<!-- FILTROS -->
 <div class="filters">
-  <span class="filter-label">Conta</span>
-  <select id="filterAccount">
+  <span class="fl">Conta</span>
+  <select id="f-conta">
     <option value="all">Todas (03 + 04)</option>
     <option value="Conta 03">Conta 03</option>
     <option value="Conta 04">Conta 04</option>
   </select>
-
-  <span class="filter-label">Lote</span>
-  <select id="filterLote">
-    <option value="">Todos os Lotes</option>
+  <span class="fl">Lote</span>
+  <select id="f-lote">
+    <option value="">Todos</option>
     <option value="Lote 1">Lote 1</option>
     <option value="Lote 2">Lote 2</option>
     <option value="Lote 3">Lote 3</option>
     <option value="Sem Lote">Sem Lote</option>
   </select>
-
-  <span class="filter-label">Período</span>
-  <div class="date-range">
-    <input type="date" id="filterSince">
-    <span class="date-sep">→</span>
-    <input type="date" id="filterUntil">
-  </div>
-
-  <select id="filterPreset">
+  <span class="fl">Período</span>
+  <div class="dr"><input type="date" id="f-since"><span class="ds">→</span><input type="date" id="f-until"></div>
+  <select id="f-preset">
     <option value="">Personalizado</option>
     <option value="today">Hoje</option>
     <option value="yesterday">Ontem</option>
-    <option value="last_7d">Últimos 7 dias</option>
-    <option value="last_30d">Últimos 30 dias</option>
+    <option value="last_7d">7 dias</option>
+    <option value="last_30d">30 dias</option>
     <option value="this_month" selected>Este mês</option>
     <option value="last_month">Mês passado</option>
   </select>
-
-  <button class="btn-refresh" id="btnRefresh" onclick="loadAll()">
-    <svg id="refreshIcon" viewBox="0 0 16 16" fill="currentColor"><path d="M13.65 2.35A8 8 0 1015 8h-2a6 6 0 11-1.06-3.41l-1.65 1.65A.5.5 0 0011 7h4.5A.5.5 0 0016 6.5V2a.5.5 0 00-.85-.35l-1.5 1.5z"/></svg>
+  <button class="btn-ref" id="btn-ref" onclick="carrega()">
+    <svg id="ic-ref" viewBox="0 0 16 16"><path d="M13.65 2.35A8 8 0 1015 8h-2a6 6 0 11-1.06-3.41l-1.65 1.65A.5.5 0 0011 7h4.5A.5.5 0 0016 6.5V2a.5.5 0 00-.85-.35l-1.5 1.5z"/></svg>
     Atualizar
   </button>
 </div>
 
-<!-- MAIN CONTENT -->
+<!-- CONTEÚDO -->
 <div class="content">
 
-  <!-- OVERVIEW TAB -->
-  <div class="tab-pane active" id="tab-overview">
-    <div class="summary-grid" id="summaryCards">
-      <div class="loading-wrap"><div class="loading-spinner"></div></div>
+  <div class="pane active" id="pane-overview">
+    <div class="cards" id="sum-cards"><div class="loading"><div class="spinner"></div></div></div>
+    <div class="charts" id="charts-row" style="display:none">
+      <div class="chart-box"><div class="chart-lbl">Gasto × Compras por Conta</div><div class="chart-wrap"><canvas id="ch-contas"></canvas></div></div>
+      <div class="chart-box"><div class="chart-lbl">Top 8 Anúncios por Cliques</div><div class="chart-wrap"><canvas id="ch-top"></canvas></div></div>
     </div>
-    <div class="charts-row" id="chartsRow" style="display:none">
-      <div class="chart-card">
-        <div class="chart-title">Gasto × Compras por Conta</div>
-        <div class="chart-wrap"><canvas id="chartSpendSales"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Top Anúncios por Cliques</div>
-        <div class="chart-wrap"><canvas id="chartTopAds"></canvas></div>
-      </div>
-    </div>
-    <div id="overviewTable"></div>
+    <div id="ov-table"></div>
   </div>
 
-  <!-- ADS TAB -->
-  <div class="tab-pane" id="tab-ads">
-    <div id="adsContent">
-      <div class="loading-wrap"><div class="loading-spinner"></div><div class="loading-text">Carregando anúncios…</div></div>
-    </div>
+  <div class="pane" id="pane-ads">
+    <div id="ads-content"><div class="loading"><div class="spinner"></div><div class="lt">Carregando anúncios…</div></div></div>
   </div>
 
-  <!-- COMERCIAL TAB -->
-  <div class="tab-pane" id="tab-comercial">
-    <div id="comercialContent">
-      <div class="loading-wrap"><div class="loading-spinner"></div><div class="loading-text">Carregando dados comerciais…</div></div>
-    </div>
+  <div class="pane" id="pane-comercial">
+    <div id="com-content"><div class="loading"><div class="spinner"></div><div class="lt">Carregando comercial…</div></div></div>
   </div>
 
-  <!-- CREATIVES TAB -->
-  <div class="tab-pane" id="tab-creatives">
-    <div id="creativesContent">
-      <div class="loading-wrap"><div class="loading-spinner"></div><div class="loading-text">Analisando criativos…</div></div>
-    </div>
+  <div class="pane" id="pane-criativos">
+    <div id="cri-content"><div class="loading"><div class="spinner"></div><div class="lt">Analisando criativos…</div></div></div>
   </div>
 
-</div><!-- /content -->
-</div><!-- /app -->
-
+</div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
 // ============================================================
-// CONFIG — Token está embutido no Code.gs (MktConnector)
-// Só precisa configurar a URL do Apps Script aqui
+// CONFIG — apenas a URL do Apps Script é necessária aqui
+// Token e tudo mais está no Code.gs (MktConnector)
 // ============================================================
-let SCRIPT_URL = localStorage.getItem('meta_dash_url') || 'NOT_SET';
+let URL_GS = localStorage.getItem('meta_dash_url') || '';
 
-function checkConfig() {
-  const saved = localStorage.getItem('meta_dash_url');
-  if (saved) {
-    document.getElementById('configUrl').value = saved;
-  }
-  if (SCRIPT_URL === 'NOT_SET') {
-    document.getElementById('configModal').style.display = 'flex';
-  } else {
-    loadConfigStatus();
-    loadSheetOptions();
-  }
-}
-
-function openConfig() {
-  const saved = localStorage.getItem('meta_dash_url');
-  if (saved) document.getElementById('configUrl').value = saved;
-  document.getElementById('configModal').style.display = 'flex';
-  loadConfigStatus();
-  loadSheetOptions();
-}
-
-function saveScriptUrl() {
-  const url = document.getElementById('configUrl').value.trim();
-  if (!url.startsWith('https://script.google.com')) {
-    showToast('URL inválida — deve começar com https://script.google.com', 'error');
-    return;
-  }
-  localStorage.setItem('meta_dash_url', url);
-  SCRIPT_URL = url;
-  showToast('✅ URL salva!', 'success');
-  loadConfigStatus();
-  loadSheetOptions();
-  document.getElementById('configModal').style.display = 'none';
-  if (!state.loaded) {
-    loadAll();
-    setInterval(loadAll, 5 * 60 * 1000);
-  }
-}
-
-async function loadConfigStatus() {
-  const el = document.getElementById('configStatus');
-  if (!el) return;
-  if (SCRIPT_URL === 'NOT_SET') {
-    el.innerHTML = '⚠️ Cole a URL do Apps Script acima para começar';
-    el.style.borderColor = 'rgba(245,166,35,0.4)';
-    return;
-  }
-  el.innerHTML = '⏳ Verificando...';
-  try {
-    const s = await apiFetch('getStatus');
-    const ok = s.meta_api_ok;
-    el.innerHTML = `
-      <div style="margin-bottom:5px">🔗 Apps Script: <span style="color:#1edb8c;font-weight:500">Conectado</span>
-        <span style="color:#5555aa;font-size:10px;margin-left:6px">${s.token_source || ''}</span>
-      </div>
-      <div style="margin-bottom:5px">${ok ? '✅' : '❌'} Meta API (MktConnector): 
-        <span style="color:${ok ? '#1edb8c' : '#ff5757'};font-weight:500">${ok ? 'OK — ' + (s.meta_user || '') : (s.meta_error || 'erro')}</span>
-      </div>
-      <div>📋 Aba comercial: <strong>${s.sheet_name}</strong>
-        ${s.sheets_available ? `<span style="color:#5555aa;font-size:10px"> · disponíveis: ${s.sheets_available.join(', ')}</span>` : ''}
-      </div>
-    `;
-    el.style.borderColor = ok ? 'rgba(30,219,140,0.3)' : 'rgba(255,87,87,0.3)';
-    el.style.background = ok ? 'rgba(30,219,140,0.05)' : 'rgba(255,87,87,0.05)';
-  } catch(e) {
-    el.innerHTML = '❌ Não foi possível conectar: ' + e.message;
-    el.style.borderColor = 'rgba(255,87,87,0.3)';
-  }
-}
-
-async function loadSheetOptions() {
-  if (SCRIPT_URL === 'NOT_SET') return;
-  try {
-    const r = await apiFetch('getSheets');
-    const sel = document.getElementById('sheetSelect');
-    const current = localStorage.getItem('meta_dash_sheetname') || 'Comercial';
-    if (r.sheets && r.sheets.length > 0) {
-      sel.innerHTML = r.sheets.map(s =>
-        `<option value="${s}" ${s === current ? 'selected' : ''}>${s}</option>`
-      ).join('');
-    } else {
-      sel.innerHTML = '<option value="">Nenhuma aba encontrada</option>';
-    }
-  } catch(e) { /* ignore */ }
-}
-
-async function saveSheet() {
-  const name = document.getElementById('sheetSelect').value;
-  if (!name) return;
-  try {
-    await apiFetch('setSheet', { name });
-    localStorage.setItem('meta_dash_sheetname', name);
-    showToast('Aba "' + name + '" configurada', 'success');
-    loadConfigStatus();
-  } catch(e) {
-    showToast('Erro: ' + e.message, 'error');
-  }
-}
-
-async function runDiagnosis() {
-  const el = document.getElementById('diagResult');
-  el.style.display = 'block';
-  el.textContent = 'Rodando diagnóstico...';
-  try {
-    const s = await apiFetch('getStatus');
-    el.textContent = JSON.stringify(s, null, 2);
-  } catch(e) {
-    el.textContent = 'Erro: ' + e.message;
-  }
-}
-
-// ============================================================
-// STATE
-// ============================================================
-let state = {
-  ads: [],
-  summary: {},
-  comercial: {},
-  creatives: [],
-  sortBy: 'clicks',
-  sortDir: -1,
-  loaded: false
+// Estado global
+const ST = {
+  ads: [], resumo: {}, comercial: {}, criativos: [],
+  sortKey: 'cliques', sortDir: -1, loaded: false
 };
-
-let chartSpendSales = null;
-let chartTopAds = null;
+let chContas = null, chTop = null;
 
 // ============================================================
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  initDates();
-  setupTabs();
-  setupFilters();
-  checkConfig();
-  if (SCRIPT_URL !== 'NOT_SET') {
-    loadAll();
-    setInterval(loadAll, 5 * 60 * 1000); // auto-refresh 5min
+  initDatas();
+  initTabs();
+  initFiltros();
+  if (URL_GS) {
+    carrega();
+    setInterval(carrega, 5 * 60 * 1000);
+  } else {
+    abreConfig();
   }
 });
 
-function initDates() {
-  const today = new Date();
-  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-  document.getElementById('filterSince').value = fmt(firstDay);
-  document.getElementById('filterUntil').value = fmt(today);
+function initDatas() {
+  const hoje  = new Date();
+  const prim  = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  document.getElementById('f-since').value = fmtD(prim);
+  document.getElementById('f-until').value = fmtD(hoje);
 }
 
-function fmt(d) {
-  return d.toISOString().split('T')[0];
-}
-
-function setupTabs() {
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+function initTabs() {
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.pane').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('pane-' + t.dataset.tab).classList.add('active');
     });
   });
 }
 
-function setupFilters() {
-  const preset = document.getElementById('filterPreset');
-  preset.addEventListener('change', () => {
-    if (!preset.value) return;
-    const today = new Date();
-    let since = new Date();
-    switch (preset.value) {
-      case 'today': since = today; break;
-      case 'yesterday': since = new Date(today - 86400000); document.getElementById('filterUntil').value = fmt(since); break;
-      case 'last_7d': since = new Date(today - 6 * 86400000); break;
-      case 'last_30d': since = new Date(today - 29 * 86400000); break;
-      case 'this_month': since = new Date(today.getFullYear(), today.getMonth(), 1); break;
-      case 'last_month':
-        since = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        const lastDay = new Date(today.getFullYear(), today.getMonth(), 0);
-        document.getElementById('filterUntil').value = fmt(lastDay);
-        break;
+function initFiltros() {
+  document.getElementById('f-preset').addEventListener('change', e => {
+    const v = e.target.value; if (!v) return;
+    const h = new Date(); let s = new Date();
+    if (v==='today')       s = h;
+    else if (v==='yesterday') { s = new Date(h-864e5); document.getElementById('f-until').value = fmtD(s); }
+    else if (v==='last_7d')   s = new Date(h - 6*864e5);
+    else if (v==='last_30d')  s = new Date(h - 29*864e5);
+    else if (v==='this_month') s = new Date(h.getFullYear(), h.getMonth(), 1);
+    else if (v==='last_month') {
+      s = new Date(h.getFullYear(), h.getMonth()-1, 1);
+      document.getElementById('f-until').value = fmtD(new Date(h.getFullYear(), h.getMonth(), 0));
     }
-    if (preset.value !== 'yesterday') document.getElementById('filterUntil').value = fmt(today);
-    document.getElementById('filterSince').value = fmt(since);
+    if (v !== 'yesterday' && v !== 'last_month') document.getElementById('f-until').value = fmtD(h);
+    document.getElementById('f-since').value = fmtD(s);
   });
-
-  ['filterAccount', 'filterLote'].forEach(id => {
-    document.getElementById(id).addEventListener('change', () => {
-      if (state.loaded) renderAll();
-    });
+  ['f-conta','f-lote'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => { if (ST.loaded) renderTudo(); });
   });
 }
 
 // ============================================================
-// LOAD DATA
+// CARREGAR DADOS
 // ============================================================
-async function loadAll() {
-  if (SCRIPT_URL === 'NOT_SET') {
-    showToast('Configure a URL do Apps Script primeiro — clique em ⚙️ Config', 'error');
-    openConfig();
-    return;
-  }
-  setRefreshing(true);
+async function carrega() {
+  if (!URL_GS) { toast('Configure a URL do Apps Script — clique em ⚙️ Config','err'); abreConfig(); return; }
+  setCarregando(true);
   try {
-    const since   = document.getElementById('filterSince').value;
-    const until   = document.getElementById('filterUntil').value;
-    const account = document.getElementById('filterAccount').value;
+    const since   = document.getElementById('f-since').value;
+    const until   = document.getElementById('f-until').value;
+    const account = document.getElementById('f-conta').value;
 
-    const [adsData, comercialData, creativesData] = await Promise.all([
-      apiFetch('getAdsData', { since, until, account }),
-      apiFetch('getComercial'),
-      apiFetch('getCreativesAnalysis', { since, until })
+    const [adsR, comR, criR] = await Promise.all([
+      gs('ads',       { since, until, account }),
+      gs('comercial', {}),
+      gs('criativos', { since, until, account })
     ]);
 
-    // Erro de API Meta — mostra mas não trava
-    if (adsData.error && !adsData.ads) {
-      showToast('⚠️ Meta API: ' + adsData.error, 'error');
-    }
+    if (adsR.error) { toast('Meta API: ' + adsR.error, 'err'); }
 
-    state.ads     = Array.isArray(adsData.ads) ? adsData.ads : [];
-    state.summary = adsData.summary || {};
-
-    const rc = (typeof comercialData === 'object' && comercialData) ? comercialData : {};
-    state.comercial = {
-      ...rc,
-      data:          Array.isArray(rc.data) ? rc.data : [],
-      total_sales:   Number(rc.total_sales)   || 0,
-      total_revenue: Number(rc.total_revenue) || 0
+    ST.ads       = Array.isArray(adsR.ads)             ? adsR.ads             : [];
+    ST.resumo    = adsR.resumo                         || {};
+    ST.comercial = {
+      data:          Array.isArray(comR.data)   ? comR.data   : [],
+      total_vendas:  comR.total_vendas  || 0,
+      receita_total: comR.receita_total || 0,
+      col_valor:     comR.col_valor     || null,
+      col_status:    comR.col_status    || null,
+      error:         comR.error         || null,
+      abas:          comR.abas          || []
     };
-    state.creatives = Array.isArray(creativesData.creatives) ? creativesData.creatives : [];
-    state.loaded = true;
+    ST.criativos = Array.isArray(criR.criativos) ? criR.criativos : [];
+    ST.loaded    = true;
 
-    if (adsData.errors && adsData.errors.length > 0) console.warn('Erros parciais:', adsData.errors);
-
-    renderAll();
-    document.getElementById('lastUpdate').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
-    const n = state.ads.length;
-    showToast(n > 0 ? `${n} anúncios carregados ✓` : 'Sem dados para o período selecionado', n > 0 ? 'success' : '');
+    renderTudo();
+    document.getElementById('upd-txt').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
+    const n = ST.ads.length;
+    toast(n > 0 ? n + ' anúncios carregados ✓' : 'Sem dados para o período', n > 0 ? 'ok' : '');
   } catch(err) {
-    console.error('loadAll:', err);
-    showToast('Erro: ' + err.message, 'error');
+    console.error(err);
+    toast('Erro: ' + err.message, 'err');
   }
-  setRefreshing(false);
+  setCarregando(false);
 }
 
-function apiFetch(action, params = {}) {
-  if (SCRIPT_URL === 'NOT_SET') {
-    return Promise.reject(new Error('URL do Apps Script não configurada'));
-  }
+function gs(action, params) {
+  if (!URL_GS) return Promise.reject(new Error('URL não configurada'));
   const qs = new URLSearchParams({ action, ...params }).toString();
-  return fetch(`${SCRIPT_URL}?${qs}`)
+  return fetch(URL_GS + '?' + qs)
     .then(r => {
-      // Apps Script às vezes retorna HTML de erro com 200 — verificamos content-type
       const ct = r.headers.get('content-type') || '';
-      if (!ct.includes('json')) {
-        throw new Error('O Apps Script retornou HTML em vez de JSON. Verifique: 1) Web App publicado como "Anyone" 2) Deploy atualizado após editar o código');
-      }
+      if (!ct.includes('json')) throw new Error('Apps Script retornou HTML. Verifique: 1) Deploy atualizado 2) Acesso "Anyone"');
       return r.json();
-    })
-    .then(data => {
-      // Loga erros parciais mas não lança exceção — deixa o chamador decidir
-      if (data && data.error) console.warn(`apiFetch(${action}) error:`, data.error);
-      return data;
-    })
-    .catch(err => { throw new Error(err.message); });
+    });
 }
 
 // ============================================================
-// RENDER ALL
+// RENDER
 // ============================================================
-function renderAll() {
-  const filtered = getFilteredAds();
-  try { renderSummaryCards(filtered); } catch(e) { console.warn('renderSummaryCards:', e); }
-  try { renderCharts(filtered); }      catch(e) { console.warn('renderCharts:', e); }
-  try { renderAdsTable(filtered); }    catch(e) { console.warn('renderAdsTable:', e); }
-  try { renderComercial(); }           catch(e) { console.warn('renderComercial:', e); document.getElementById('comercialContent').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div>Erro ao carregar comercial: ${e.message}</div></div>`; }
-  try { renderCreatives(); }           catch(e) { console.warn('renderCreatives:', e); }
+function renderTudo() {
+  const filtrados = filtra();
+  try { renderCards(filtrados);    } catch(e) { console.warn(e); }
+  try { renderCharts(filtrados);   } catch(e) { console.warn(e); }
+  try { renderTabela(filtrados);   } catch(e) { console.warn(e); }
+  try { renderComercial();         } catch(e) { console.warn(e); }
+  try { renderCriativos();         } catch(e) { console.warn(e); }
 }
 
-function getFilteredAds() {
-  const account = document.getElementById('filterAccount').value;
-  const lote = document.getElementById('filterLote').value;
-  return state.ads.filter(ad => {
-    if (account !== 'all' && ad.account_name !== account) return false;
-    if (lote && ad.lote !== lote) return false;
+function filtra() {
+  const conta = document.getElementById('f-conta').value;
+  const lote  = document.getElementById('f-lote').value;
+  return ST.ads.filter(a => {
+    if (conta !== 'all' && a.conta !== conta) return false;
+    if (lote  && a.lote  !== lote)            return false;
     return true;
   });
 }
 
-// ============================================================
-// SUMMARY CARDS
-// ============================================================
-function renderSummaryCards(ads) {
-  const s = buildSummary(ads);
-  const comercial = state.comercial;
-  const totalRevenue = comercial.total_revenue || 0;
-  const roi = s.spend > 0 && totalRevenue > 0 ? ((totalRevenue - s.spend) / s.spend * 100).toFixed(1) : 0;
-  const roas = s.spend > 0 && totalRevenue > 0 ? (totalRevenue / s.spend).toFixed(2) : 0;
+// CARDS
+function renderCards(ads) {
+  const s   = somaAds(ads);
+  const com = ST.comercial;
+  const rec = com.receita_total || 0;
+  const roi = s.gasto > 0 && rec > 0 ? ((rec - s.gasto) / s.gasto * 100).toFixed(1) : 0;
+  const roas= s.gasto > 0 && rec > 0 ? (rec / s.gasto).toFixed(2) : 0;
 
-  const cards = [
-    { label: 'Investimento', val: fmtBRL(s.spend), sub: '', cls: 'accent' },
-    { label: 'Cliques', val: fmtNum(s.clicks), sub: `CTR ${s.ctr.toFixed(2)}%`, cls: 'blue' },
-    { label: 'Impressões', val: fmtNum(s.impressions), sub: `Alcance ${fmtNum(s.reach)}`, cls: 'purple' },
-    { label: 'Compras (Meta)', val: fmtNum(s.purchases), sub: s.purchases > 0 ? `CPA ${fmtBRL(s.cpa)}` : '—', cls: 'green' },
-    { label: 'Leads', val: fmtNum(s.leads), sub: s.leads > 0 ? `CPL ${fmtBRL(s.cpl)}` : '—', cls: 'amber' },
-    { label: 'CPC', val: fmtBRL(s.cpc), sub: `CPM ${fmtBRL(s.cpm || 0)}`, cls: 'amber' },
-    { label: 'Receita Comercial', val: fmtBRL(totalRevenue), sub: `${comercial.total_sales || 0} vendas`, cls: 'green' },
-    { label: 'ROI', val: roi + '%', sub: `ROAS ${roas}×`, cls: parseFloat(roi) >= 0 ? 'green' : 'red' },
+  const def = [
+    { l:'Investimento',     v:R$(s.gasto),         s:'',                              c:'acc' },
+    { l:'Cliques',          v:N(s.cliques),         s:'CTR ' + s.ctr.toFixed(2)+'%',  c:'blu' },
+    { l:'Impressões',       v:N(s.impressoes),      s:'Alcance '+N(s.alcance),         c:'pur' },
+    { l:'Compras (Meta)',   v:N(s.compras),         s:s.compras>0?'CPA '+R$(s.cpa):'—', c:'grn' },
+    { l:'Leads',            v:N(s.leads),           s:s.leads>0?'CPL '+R$(s.cpl):'—', c:'amb' },
+    { l:'CPC',              v:R$(s.cpc),            s:'CPM '+R$(s.cpm),               c:'amb' },
+    { l:'Receita Comercial',v:R$(rec),              s:(com.total_vendas||0)+' vendas', c:'grn' },
+    { l:'ROI',              v:roi+'%',              s:'ROAS '+roas+'×',               c:roi>=0?'grn':'red' },
   ];
 
-  document.getElementById('summaryCards').innerHTML = cards.map(c => `
-    <div class="metric-card ${c.cls}">
-      <div class="metric-label">${c.label}</div>
-      <div class="metric-val">${c.val}</div>
-      ${c.sub ? `<div class="metric-sub">${c.sub}</div>` : ''}
-    </div>
-  `).join('');
+  document.getElementById('sum-cards').innerHTML = def.map(d =>
+    `<div class="card ${d.c}">
+      <div class="c-lbl">${d.l}</div>
+      <div class="c-val">${d.v}</div>
+      ${d.s ? `<div class="c-sub">${d.s}</div>` : ''}
+    </div>`
+  ).join('');
 }
 
-// ============================================================
 // CHARTS
-// ============================================================
 function renderCharts(ads) {
-  document.getElementById('chartsRow').style.display = 'grid';
+  document.getElementById('charts-row').style.display = 'grid';
+  const dark = true;
+  const gc = 'rgba(255,255,255,0.06)';
+  const tc = '#7878a0';
 
-  // Chart 1: Spend vs Purchases by account
-  const byAccount = {};
-  ads.forEach(ad => {
-    const k = ad.account_name || 'Outro';
-    if (!byAccount[k]) byAccount[k] = { spend: 0, purchases: 0, leads: 0 };
-    byAccount[k].spend += ad.spend || 0;
-    byAccount[k].purchases += ad.purchases || 0;
-    byAccount[k].leads += ad.leads || 0;
+  // Chart 1 — por conta
+  const byC = {};
+  ads.forEach(a => {
+    const k = a.conta || 'Outra';
+    if (!byC[k]) byC[k] = { gasto:0, compras:0, leads:0 };
+    byC[k].gasto   += a.gasto   || 0;
+    byC[k].compras += a.compras || 0;
+    byC[k].leads   += a.leads   || 0;
   });
-  const accts = Object.keys(byAccount);
-
-  if (chartSpendSales) chartSpendSales.destroy();
-  chartSpendSales = new Chart(document.getElementById('chartSpendSales'), {
-    type: 'bar',
-    data: {
-      labels: accts,
-      datasets: [
-        { label: 'Gasto (R$)', data: accts.map(k => byAccount[k].spend), backgroundColor: 'rgba(108,111,255,0.7)', borderRadius: 6, yAxisID: 'y1' },
-        { label: 'Compras', data: accts.map(k => byAccount[k].purchases), backgroundColor: 'rgba(30,219,140,0.7)', borderRadius: 6, yAxisID: 'y2' },
-        { label: 'Leads', data: accts.map(k => byAccount[k].leads), backgroundColor: 'rgba(245,166,35,0.7)', borderRadius: 6, yAxisID: 'y2' }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#8888aa', font: { size: 11 } } } },
-      scales: {
-        x: { ticks: { color: '#8888aa', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
-        y1: { position: 'left', ticks: { color: '#6c6fff', font: { size: 10 }, callback: v => 'R$' + (v/1000).toFixed(0) + 'k' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-        y2: { position: 'right', ticks: { color: '#1edb8c', font: { size: 10 } }, grid: { display: false } }
+  const lC = Object.keys(byC);
+  if (chContas) chContas.destroy();
+  chContas = new Chart(document.getElementById('ch-contas'), {
+    type:'bar',
+    data:{ labels:lC, datasets:[
+      { label:'Gasto (R$)',  data:lC.map(k=>byC[k].gasto),   backgroundColor:'rgba(108,111,255,.7)', borderRadius:5, yAxisID:'y1' },
+      { label:'Compras',     data:lC.map(k=>byC[k].compras), backgroundColor:'rgba(29,218,138,.7)',  borderRadius:5, yAxisID:'y2' },
+      { label:'Leads',       data:lC.map(k=>byC[k].leads),   backgroundColor:'rgba(245,166,35,.7)',  borderRadius:5, yAxisID:'y2' },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ color:tc, font:{ size:11 } } } },
+      scales:{
+        x:{ ticks:{color:tc,font:{size:11}}, grid:{color:gc} },
+        y1:{ position:'left',  ticks:{color:'#9b9aff',font:{size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'k'}, grid:{color:gc} },
+        y2:{ position:'right', ticks:{color:'#1dda8a',font:{size:10}}, grid:{display:false} }
       }
     }
   });
 
-  // Chart 2: Top 8 ads by clicks
-  const sorted = [...ads].sort((a, b) => (b.clicks || 0) - (a.clicks || 0)).slice(0, 8);
-  if (chartTopAds) chartTopAds.destroy();
-  chartTopAds = new Chart(document.getElementById('chartTopAds'), {
-    type: 'bar',
-    data: {
-      labels: sorted.map(a => truncate(a.name, 20)),
-      datasets: [{
-        label: 'Cliques',
-        data: sorted.map(a => a.clicks || 0),
-        backgroundColor: sorted.map(a => a.purchases > 0 ? 'rgba(30,219,140,0.7)' : 'rgba(56,189,248,0.7)'),
-        borderRadius: 4
-      }]
+  // Chart 2 — top 8 por cliques
+  const top = [...ads].sort((a,b)=>(b.cliques||0)-(a.cliques||0)).slice(0,8);
+  if (chTop) chTop.destroy();
+  chTop = new Chart(document.getElementById('ch-top'), {
+    type:'bar',
+    data:{ labels:top.map(a=>trunc(a.nome,22)),
+      datasets:[{ label:'Cliques', data:top.map(a=>a.cliques||0),
+        backgroundColor:top.map(a=>a.compras>0?'rgba(29,218,138,.7)':'rgba(56,189,248,.7)'), borderRadius:4 }]
     },
-    options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: '#8888aa', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
-        y: { ticks: { color: '#cccce8', font: { size: 10 } }, grid: { display: false } }
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ ticks:{color:tc,font:{size:10}}, grid:{color:gc} },
+        y:{ ticks:{color:'#cccce0',font:{size:10}}, grid:{display:false} }
       }
     }
   });
 }
 
-// ============================================================
-// ADS TABLE
-// ============================================================
-function renderAdsTable(ads) {
-  const sorted = sortAds(ads);
-  const container = document.getElementById('adsContent');
+// TABELA ADS
+function renderTabela(ads) {
+  const sorted = ordena(ads);
+  const el = document.getElementById('ads-content');
 
-  if (sorted.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div>Nenhum anúncio encontrado para os filtros selecionados.</div></div>`;
+  if (!sorted.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-ic">📭</div>Nenhum anúncio encontrado.</div>`;
+    renderOvTable([]);
     return;
   }
 
-  const cols = [
-    { key: 'name', label: 'Anúncio', w: '' },
-    { key: 'account_name', label: 'Conta', w: '90px' },
-    { key: 'lote', label: 'Lote', w: '80px' },
-    { key: 'status', label: 'Status', w: '110px' },
-    { key: 'spend', label: 'Gasto', w: '90px', sortable: true },
-    { key: 'clicks', label: 'Cliques', w: '80px', sortable: true },
-    { key: 'ctr', label: 'CTR', w: '70px', sortable: true },
-    { key: 'cpc', label: 'CPC', w: '80px', sortable: true },
-    { key: 'purchases', label: 'Compras', w: '80px', sortable: true },
-    { key: 'cpa', label: 'CPA', w: '90px', sortable: true },
-    { key: 'leads', label: 'Leads', w: '70px', sortable: true },
-    { key: 'cpl', label: 'CPL', w: '80px', sortable: true },
-    { key: 'attribution', label: 'Atribuição', w: '120px' },
-  ];
-
-  const sortButtons = ['clicks', 'spend', 'purchases', 'leads', 'ctr', 'cpc', 'cpa', 'cpl'].map(k =>
-    `<button class="sort-btn ${state.sortBy === k ? 'active' : ''}" onclick="setSortBy('${k}')">${{
-      clicks:'Cliques', spend:'Gasto', purchases:'Compras', leads:'Leads',
-      ctr:'CTR', cpc:'CPC', cpa:'CPA', cpl:'CPL'
-    }[k]}</button>`
+  const sortKeys = ['cliques','gasto','compras','leads','ctr','cpc','cpa','cpl'];
+  const sortLabels = { cliques:'Cliques',gasto:'Gasto',compras:'Compras',leads:'Leads',ctr:'CTR',cpc:'CPC',cpa:'CPA',cpl:'CPL' };
+  const sortBar = sortKeys.map(k =>
+    `<button class="sbtn${ST.sortKey===k?' on':''}" onclick="setSortKey('${k}')">${sortLabels[k]}</button>`
   ).join('');
 
-  const rows = sorted.map(ad => {
-    const thumb = ad.thumbnail_url
-      ? `<img class="ad-thumb" src="${ad.thumbnail_url}" onerror="this.style.display='none'">`
-      : `<div class="ad-thumb-placeholder">🎬</div>`;
+  el.innerHTML = `
+    <div class="tbl-hd">
+      <div class="tbl-title">Anúncios <span class="tbl-ct">(${sorted.length})</span></div>
+    </div>
+    <div class="sort-bar"><span class="sort-lbl">Ordenar:</span>${sortBar}</div>
+    <div class="tw">${buildTable(sorted)}</div>`;
 
-    const adLink = ad.ad_url
-      ? `<a class="ad-link" href="${ad.ad_url}" target="_blank">Ver anúncio ↗</a>`
-      : `<a class="ad-link" href="https://adsmanager.facebook.com/adsmanager/manage/ads?act=${ad.account_id}&selected_ad_ids=${ad.id}" target="_blank">Abrir no Ads Manager ↗</a>`;
+  renderOvTable(sorted);
+}
 
-    const acctNum = ad.account_name?.replace('Conta ', '') || '';
-    const acctBadge = `<span class="account-badge account-${acctNum}">${ad.account_name || '—'}</span>`;
-    const loteBadge = ad.lote && ad.lote !== 'Sem Lote'
-      ? `<span class="lote-badge">${ad.lote}</span>` : `<span style="color:var(--text2);font-size:11px">—</span>`;
-
-    const attr = ad.attribution || {};
-    const attrHtml = (attr.purchases_1d_click || attr.purchases_7d_click || attr.purchases_1d_view || attr.purchases_7d_view)
-      ? `<div class="attr-mini">
-          ${attr.purchases_1d_click ? `<div class="attr-row"><span class="attr-label">1d cli</span>${attr.purchases_1d_click}</div>` : ''}
-          ${attr.purchases_7d_click ? `<div class="attr-row"><span class="attr-label">7d cli</span>${attr.purchases_7d_click}</div>` : ''}
-          ${attr.purchases_1d_view ? `<div class="attr-row"><span class="attr-label">1d view</span>${attr.purchases_1d_view}</div>` : ''}
-          ${attr.purchases_7d_view ? `<div class="attr-row"><span class="attr-label">7d view</span>${attr.purchases_7d_view}</div>` : ''}
-        </div>` : `<span style="color:var(--text2);font-size:11px">—</span>`;
+function buildTable(ads) {
+  const rows = ads.map(a => {
+    const acctNum = (a.conta||'').replace('Conta ','');
+    const loteB   = a.lote && a.lote!=='Sem Lote'
+      ? `<span class="lote-b">${a.lote}</span>` : `<span class="muted">—</span>`;
+    const attrH   = (a.attr_1d_click||a.attr_7d_click||a.attr_1d_view||a.attr_7d_view) ?
+      `<div class="attr-b">
+        ${a.attr_1d_click?`<div class="attr-r"><span class="attr-l">1d cli</span>${a.attr_1d_click}</div>`:''}
+        ${a.attr_7d_click?`<div class="attr-r"><span class="attr-l">7d cli</span>${a.attr_7d_click}</div>`:''}
+        ${a.attr_1d_view ?`<div class="attr-r"><span class="attr-l">1d view</span>${a.attr_1d_view}</div>`:''}
+        ${a.attr_7d_view ?`<div class="attr-r"><span class="attr-l">7d view</span>${a.attr_7d_view}</div>`:''}
+      </div>` : `<span class="muted">—</span>`;
 
     return `<tr>
-      <td>
-        <div class="ad-info">
-          ${thumb}
-          <div>
-            <div class="ad-name" title="${esc(ad.name)}">${esc(truncate(ad.name, 40))}</div>
-            <div class="ad-campaign" title="${esc(ad.campaign_name)}">${esc(truncate(ad.campaign_name || '', 40))}</div>
-            ${adLink}
-          </div>
+      <td><div class="ad-wrap">
+        ${a.thumb
+          ? `<img class="thumb" src="${esc(a.thumb)}" onerror="this.style.display='none'">`
+          : `<div class="thumb-ph">🎬</div>`}
+        <div>
+          <div class="ad-nm" title="${esc(a.nome)}">${esc(trunc(a.nome,38))}</div>
+          <div class="ad-camp" title="${esc(a.campanha)}">${esc(trunc(a.campanha||'',38))}</div>
+          <a class="ad-link" href="${esc(a.url)}" target="_blank">Ver anúncio ↗</a>
         </div>
-      </td>
-      <td>${acctBadge}</td>
-      <td>${loteBadge}</td>
-      <td><span class="status-badge status-${ad.status || ''}">${fmtStatus(ad.status)}</span></td>
-      <td><span class="num accent">${fmtBRL(ad.spend)}</span></td>
-      <td><span class="num">${fmtNum(ad.clicks)}</span></td>
-      <td><span class="num ${ad.ctr >= 2 ? 'green' : ad.ctr < 1 ? 'amber' : ''}">${(ad.ctr || 0).toFixed(2)}%</span></td>
-      <td><span class="num ${ad.cpc > 0 && ad.cpc < 3 ? 'green' : ad.cpc > 7 ? 'red' : ''}">${fmtBRL(ad.cpc)}</span></td>
-      <td><span class="num ${ad.purchases > 0 ? 'green' : ''}">${fmtNum(ad.purchases)}</span></td>
-      <td><span class="num ${ad.cpa > 0 && ad.cpa < 500 ? 'green' : ad.cpa > 1000 ? 'red' : ''}">${ad.cpa > 0 ? fmtBRL(ad.cpa) : '—'}</span></td>
-      <td><span class="num ${ad.leads > 0 ? 'green' : ''}">${fmtNum(ad.leads)}</span></td>
-      <td><span class="num ${ad.cpl > 0 && ad.cpl < 20 ? 'green' : ad.cpl > 50 ? 'red' : ''}">${ad.cpl > 0 ? fmtBRL(ad.cpl) : '—'}</span></td>
-      <td>${attrHtml}</td>
+      </div></td>
+      <td><span class="badge ct-0${esc(acctNum)}">${esc(a.conta||'—')}</span></td>
+      <td>${loteB}</td>
+      <td><span class="badge st-${esc(a.status||'')}">${fmtStatus(a.status)}</span></td>
+      <td><span class="mono ok">${R$(a.gasto)}</span></td>
+      <td><span class="mono">${N(a.cliques)}</span></td>
+      <td><span class="mono ${a.ctr>=2?'ok':a.ctr<1?'warn':''}">${(a.ctr||0).toFixed(2)}%</span></td>
+      <td><span class="mono ${a.cpc>0&&a.cpc<3?'ok':a.cpc>7?'bad':''}">${R$(a.cpc)}</span></td>
+      <td><span class="mono ${a.compras>0?'ok':''}">${N(a.compras)}</span></td>
+      <td><span class="mono ${a.cpa>0&&a.cpa<500?'ok':a.cpa>1000?'bad':''}">${a.cpa>0?R$(a.cpa):'—'}</span></td>
+      <td><span class="mono ${a.leads>0?'ok':''}">${N(a.leads)}</span></td>
+      <td><span class="mono ${a.cpl>0&&a.cpl<20?'ok':a.cpl>50?'bad':''}">${a.cpl>0?R$(a.cpl):'—'}</span></td>
+      <td>${attrH}</td>
     </tr>`;
   }).join('');
 
-  container.innerHTML = `
-    <div class="table-header">
-      <div class="table-title">Anúncios (${sorted.length})</div>
-    </div>
-    <div class="sort-bar">
-      <span class="sort-label">Ordenar por:</span>
-      ${sortButtons}
-    </div>
-    <div class="ads-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            ${cols.map(c => `<th ${c.w ? `style="width:${c.w}"` : ''} ${c.sortable ? `class="sortable ${state.sortBy === c.key ? 'sorted' : ''}" onclick="setSortBy('${c.key}')"` : ''}>${c.label}</th>`).join('')}
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
-
-  // Also render in overview tab
-  document.getElementById('overviewTable').innerHTML = `
-    <div style="font-size:13px;font-weight:600;margin-bottom:12px">Top Anúncios por Compras</div>
-    <div class="ads-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Anúncio</th><th>Conta</th><th>Lote</th><th>Gasto</th>
-            <th>Cliques</th><th>Compras</th><th>CPA</th><th>Leads</th><th>CPL</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${[...sorted].sort((a,b) => (b.purchases||0) - (a.purchases||0)).slice(0,10).map(ad => `
-            <tr>
-              <td>
-                <div class="ad-info">
-                  ${ad.thumbnail_url ? `<img class="ad-thumb" src="${ad.thumbnail_url}" onerror="this.style.display='none'">` : '<div class="ad-thumb-placeholder">🎬</div>'}
-                  <div>
-                    <div class="ad-name" title="${esc(ad.name)}">${esc(truncate(ad.name, 35))}</div>
-                    ${ad.ad_url ? `<a class="ad-link" href="${ad.ad_url}" target="_blank" style="opacity:1">Ver anúncio ↗</a>` : ''}
-                  </div>
-                </div>
-              </td>
-              <td><span class="account-badge account-${ad.account_name?.replace('Conta ','')||''}">${ad.account_name||'—'}</span></td>
-              <td>${ad.lote && ad.lote !== 'Sem Lote' ? `<span class="lote-badge">${ad.lote}</span>` : '—'}</td>
-              <td><span class="num accent">${fmtBRL(ad.spend)}</span></td>
-              <td><span class="num">${fmtNum(ad.clicks)}</span></td>
-              <td><span class="num ${ad.purchases > 0 ? 'green' : ''}">${fmtNum(ad.purchases)}</span></td>
-              <td><span class="num">${ad.cpa > 0 ? fmtBRL(ad.cpa) : '—'}</span></td>
-              <td><span class="num ${ad.leads > 0 ? 'green' : ''}">${fmtNum(ad.leads)}</span></td>
-              <td><span class="num">${ad.cpl > 0 ? fmtBRL(ad.cpl) : '—'}</span></td>
-            </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>`;
+  return `<table><thead><tr>
+    <th>Anúncio</th><th>Conta</th><th>Lote</th><th>Status</th>
+    <th>Gasto</th><th>Cliques</th><th>CTR</th><th>CPC</th>
+    <th>Compras</th><th>CPA</th><th>Leads</th><th>CPL</th><th>Atribuição</th>
+  </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-// ============================================================
-// COMERCIAL
-// ============================================================
-function renderComercial() {
-  const c = state.comercial || {};
-  const container = document.getElementById('comercialContent');
-
-  if (c.error) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div>${c.error}</div><div style="margin-top:8px;font-size:12px;color:var(--text2)">Verifique o nome da aba "Comercial" na planilha.</div></div>`;
-    return;
-  }
-
-  const totalSales = c.total_sales || 0;
-  const totalRevenue = c.total_revenue || 0;
-  const avgTicket = totalSales > 0 ? totalRevenue / totalSales : 0;
-
-  // Garante que data é sempre um array, independente do que vier do servidor
-  const rawData = c.data;
-  const rows = (Array.isArray(rawData) ? rawData : []).slice(0, 50);
-
-  container.innerHTML = `
-    <div class="comercial-summary">
-      <div class="metric-card green"><div class="metric-label">Total de Compras</div><div class="metric-val">${totalSales}</div></div>
-      <div class="metric-card accent"><div class="metric-label">Receita Total</div><div class="metric-val">${fmtBRL(totalRevenue)}</div></div>
-      <div class="metric-card amber"><div class="metric-label">Ticket Médio</div><div class="metric-val">${fmtBRL(avgTicket)}</div></div>
-    </div>
-    ${rows.length > 0 ? `
-      <div class="ads-table-wrap">
-        <table>
-          <thead>
-            <tr>${Object.keys(rows[0] || {}).slice(0, 8).map(h => `<th>${esc(h)}</th>`).join('')}</tr>
-          </thead>
-          <tbody>
-            ${rows.map(row => `<tr>${Object.values(row).slice(0, 8).map(v => `<td>${esc(String(v))}</td>`).join('')}</tr>`).join('')}
-          </tbody>
-        </table>
-      </div>` : `<div class="empty-state"><div class="empty-icon">📋</div><div>Nenhum dado de compra encontrado na planilha Comercial.</div></div>`}`;
-}
-
-// ============================================================
-// CREATIVES
-// ============================================================
-function renderCreatives() {
-  const container = document.getElementById('creativesContent');
-  const lote = document.getElementById('filterLote').value;
-  const account = document.getElementById('filterAccount').value;
-
-  let creatives = state.creatives;
-  if (creatives.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎨</div><div>Nenhum criativo encontrado.</div></div>`;
-    return;
-  }
-
-  const topByClicks = [...creatives].sort((a,b) => b.total_clicks - a.total_clicks).slice(0, 3).map(c => c.name);
-
-  const cards = creatives.map(c => {
-    const scoreCls = c.score >= 70 ? 'high' : c.score >= 40 ? 'mid' : 'low';
-    const thumb = c.thumbnail
-      ? `<img class="creative-thumb" src="${c.thumbnail}" onerror="this.parentElement.innerHTML='<div class=\\"creative-thumb-placeholder\\">🎬</div>'">`
-      : `<div class="creative-thumb-placeholder">🎬</div>`;
-
-    const links = (c.ad_urls || []).slice(0, 2).map((url, i) =>
-      `<a class="creative-link" href="${url}" target="_blank">Ver anúncio ${c.ad_urls.length > 1 ? i+1 : ''} ↗</a>`
-    ).join('');
-
-    return `
-      <div class="creative-card">
-        <div class="creative-thumb-wrap">
-          ${thumb}
-          <div class="score-badge ${scoreCls}">Score ${c.score}</div>
+function renderOvTable(ads) {
+  const top = [...ads].sort((a,b)=>(b.compras||0)-(a.compras||0)).slice(0,10);
+  document.getElementById('ov-table').innerHTML = top.length ? `
+    <div class="tbl-title" style="margin-bottom:10px">Top Anúncios por Compras</div>
+    <div class="tw"><table><thead><tr>
+      <th>Anúncio</th><th>Conta</th><th>Lote</th>
+      <th>Gasto</th><th>Cliques</th><th>Compras</th><th>CPA</th><th>Leads</th><th>CPL</th><th>ROAS</th>
+    </tr></thead><tbody>
+    ${top.map(a => `<tr>
+      <td><div class="ad-wrap">
+        ${a.thumb?`<img class="thumb" src="${esc(a.thumb)}" onerror="this.style.display='none'">`:`<div class="thumb-ph">🎬</div>`}
+        <div>
+          <div class="ad-nm">${esc(trunc(a.nome,35))}</div>
+          <a class="ad-link" href="${esc(a.url)}" target="_blank" style="opacity:1">Ver anúncio ↗</a>
         </div>
-        <div class="creative-body">
-          <div class="creative-name">${esc(c.name)}</div>
-          <div class="creative-metrics">
-            <div class="c-metric"><div class="c-metric-val" style="color:var(--blue)">${fmtNum(c.total_clicks)}</div><div class="c-metric-label">Cliques</div></div>
-            <div class="c-metric"><div class="c-metric-val" style="color:var(--green)">${fmtNum(c.total_purchases)}</div><div class="c-metric-label">Compras</div></div>
-            <div class="c-metric"><div class="c-metric-val" style="color:var(--amber)">${fmtNum(c.total_leads)}</div><div class="c-metric-label">Leads</div></div>
-            <div class="c-metric"><div class="c-metric-val">${c.ctr}%</div><div class="c-metric-label">CTR</div></div>
-            <div class="c-metric"><div class="c-metric-val">${fmtBRL(parseFloat(c.cpc))}</div><div class="c-metric-label">CPC</div></div>
-            <div class="c-metric"><div class="c-metric-val" style="color:var(--accent2)">${fmtBRL(parseFloat(c.total_spend))}</div><div class="c-metric-label">Gasto</div></div>
+      </div></td>
+      <td><span class="badge ct-0${esc((a.conta||'').replace('Conta ',''))}">${esc(a.conta||'—')}</span></td>
+      <td>${a.lote&&a.lote!=='Sem Lote'?`<span class="lote-b">${a.lote}</span>`:'—'}</td>
+      <td><span class="mono ok">${R$(a.gasto)}</span></td>
+      <td><span class="mono">${N(a.cliques)}</span></td>
+      <td><span class="mono ${a.compras>0?'ok':''}">${N(a.compras)}</span></td>
+      <td><span class="mono">${a.cpa>0?R$(a.cpa):'—'}</span></td>
+      <td><span class="mono ${a.leads>0?'ok':''}">${N(a.leads)}</span></td>
+      <td><span class="mono">${a.cpl>0?R$(a.cpl):'—'}</span></td>
+      <td><span class="mono ${a.roas>2?'ok':''}">${a.roas>0?a.roas.toFixed(2)+'×':'—'}</span></td>
+    </tr>`).join('')}
+    </tbody></table></div>` : '';
+}
+
+// COMERCIAL
+function renderComercial() {
+  const c = ST.comercial;
+  const el = document.getElementById('com-content');
+  if (c.error && !c.data.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-ic">⚠️</div>
+      <div>${esc(c.error)}</div>
+      ${c.abas.length?`<div style="margin-top:8px;font-size:12px;color:var(--txt2)">Abas disponíveis: ${c.abas.join(', ')}</div>`:''}
+      <div style="margin-top:10px;font-size:12px;color:var(--txt2)">Ajuste em ⚙️ Config → Aba Comercial</div>
+    </div>`;
+    return;
+  }
+  const rows = c.data.slice(0,50);
+  const headers = rows.length ? Object.keys(rows[0]).slice(0,8) : [];
+  el.innerHTML = `
+    <div class="com-cards">
+      <div class="card grn"><div class="c-lbl">Total de Compras</div><div class="c-val">${N(c.total_vendas)}</div></div>
+      <div class="card acc"><div class="c-lbl">Receita Total</div><div class="c-val">${R$(c.receita_total)}</div></div>
+      <div class="card amb"><div class="c-lbl">Ticket Médio</div><div class="c-val">${c.total_vendas>0?R$(c.receita_total/c.total_vendas):'—'}</div></div>
+    </div>
+    ${rows.length ? `
+    <div class="tw"><table>
+      <thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r=>`<tr>${headers.map(h=>`<td>${esc(String(r[h]||''))}</td>`).join('')}</tr>`).join('')}</tbody>
+    </table></div>` : `<div class="empty"><div class="empty-ic">📋</div>Nenhum dado de compra encontrado.</div>`}`;
+}
+
+// CRIATIVOS
+function renderCriativos() {
+  const el = document.getElementById('cri-content');
+  if (!ST.criativos.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-ic">🎨</div>Nenhum criativo encontrado.</div>`; return;
+  }
+  const top3 = ST.criativos.slice(0,3).map(c=>trunc(c.nome,30)).join(', ');
+  el.innerHTML = `
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;color:var(--txt2);margin-bottom:4px">🏆 Top por cliques: <strong>${esc(top3)}</strong></div>
+      <div style="font-size:11px;color:var(--txt2)">${ST.criativos.length} criativos analisados</div>
+    </div>
+    <div class="cri-grid">${ST.criativos.map(c => {
+      const sc = c.score>=70?'hi':c.score>=40?'md':'lo';
+      return `<div class="cri-card">
+        <div class="cri-img">
+          ${c.thumb?`<img src="${esc(c.thumb)}" onerror="this.parentElement.innerHTML='<div class=cri-img-ph>🎬</div>'">`:`<div class="cri-img-ph">🎬</div>`}
+          <div class="sc-badge sc-${sc}">Score ${c.score}</div>
+        </div>
+        <div class="cri-body">
+          <div class="cri-nome">${esc(c.nome)}</div>
+          <div class="cri-met">
+            <div><div class="cm-v" style="color:var(--blu)">${N(c.cliques)}</div><div class="cm-l">Cliques</div></div>
+            <div><div class="cm-v" style="color:var(--grn)">${N(c.compras)}</div><div class="cm-l">Compras</div></div>
+            <div><div class="cm-v" style="color:var(--amb)">${N(c.leads)}</div><div class="cm-l">Leads</div></div>
+            <div><div class="cm-v">${c.ctr}%</div><div class="cm-l">CTR</div></div>
+            <div><div class="cm-v">${R$(+c.cpc)}</div><div class="cm-l">CPC</div></div>
+            <div><div class="cm-v" style="color:var(--acc2)">${R$(c.gasto)}</div><div class="cm-l">Gasto</div></div>
           </div>
-          ${c.cpa > 0 || c.cpl > 0 ? `
-          <div style="display:flex;gap:12px;margin-bottom:10px">
-            ${c.cpa > 0 ? `<div class="c-metric"><div class="c-metric-val" style="font-size:13px">${fmtBRL(parseFloat(c.cpa))}</div><div class="c-metric-label">CPA</div></div>` : ''}
-            ${c.cpl > 0 ? `<div class="c-metric"><div class="c-metric-val" style="font-size:13px">${fmtBRL(parseFloat(c.cpl))}</div><div class="c-metric-label">CPL</div></div>` : ''}
-          </div>` : ''}
-          <div class="creative-insights">
-            ${(c.insights || []).map(i => `<div class="creative-insight">${i}</div>`).join('')}
-          </div>
-          ${links ? `<div class="creative-links">${links}</div>` : ''}
+          ${c.cpa>0||c.cpl>0?`<div style="display:flex;gap:14px;margin-bottom:9px">
+            ${c.cpa>0?`<div><div class="cm-v" style="font-size:13px">${R$(+c.cpa)}</div><div class="cm-l">CPA</div></div>`:''}
+            ${c.cpl>0?`<div><div class="cm-v" style="font-size:13px">${R$(+c.cpl)}</div><div class="cm-l">CPL</div></div>`:''}
+            ${c.roas>0?`<div><div class="cm-v" style="font-size:13px;color:var(--grn)">${c.roas}×</div><div class="cm-l">ROAS</div></div>`:''}
+          </div>`:''}
+          <div class="cri-ins">${(c.insights||[]).map(i=>`<div class="ci">${i}</div>`).join('')}</div>
+          ${c.urls&&c.urls.length?`<div class="cri-links">${[...new Set(c.urls)].slice(0,2).map((u,i)=>`<a class="cri-lnk" href="${esc(u)}" target="_blank">Ver anúncio${c.urls.length>1?' '+(i+1):''} ↗</a>`).join('')}</div>`:''}
         </div>
       </div>`;
-  });
+    }).join('')}</div>`;
+}
 
-  container.innerHTML = `
-    <div style="margin-bottom:16px">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:6px">🏆 Top por cliques: ${topByClicks.map(n => `<strong>${esc(truncate(n, 30))}</strong>`).join(', ')}</div>
-      <div style="font-size:12px;color:var(--text2)">${creatives.length} criativos analisados · ordenados por cliques</div>
-    </div>
-    <div class="creatives-grid">${cards.join('')}</div>`;
+// ============================================================
+// CONFIG MODAL
+// ============================================================
+function abreConfig() {
+  const saved = localStorage.getItem('meta_dash_url');
+  if (saved) document.getElementById('cfg-url').value = saved;
+  document.getElementById('cfg-modal').style.display = 'flex';
+  checaStatus();
+  carregaAbas();
+}
+function fechaConfig() {
+  document.getElementById('cfg-modal').style.display = 'none';
+}
+
+async function checaStatus() {
+  const el = document.getElementById('cfg-status');
+  if (!URL_GS) { el.innerHTML = '⚠️ Cole a URL do Apps Script acima'; el.style.borderColor='rgba(245,166,35,.4)'; return; }
+  el.innerHTML = '⏳ Verificando…';
+  try {
+    const s = await gs('status', {});
+    const ok = s.ok;
+    el.innerHTML = `
+      🔗 Apps Script: <span style="color:var(--grn)">Conectado</span><br>
+      ${ok?'✅':'❌'} Meta API (MktConnector): <span style="color:${ok?'var(--grn)':'var(--red)'};font-weight:500">${ok?'OK — '+(s.user||''):(s.error||'erro')}</span><br>
+      📋 Aba comercial: <strong>${s.sheet||'—'}</strong>
+      ${s.sheets&&s.sheets.length?`<br><span style="font-size:10px;color:var(--txt3)">Abas: ${s.sheets.join(', ')}</span>`:''}
+    `;
+    el.style.borderColor = ok ? 'rgba(29,218,138,.3)' : 'rgba(255,82,82,.3)';
+    el.style.background  = ok ? 'rgba(29,218,138,.05)' : 'rgba(255,82,82,.05)';
+  } catch(e) {
+    el.innerHTML = '❌ Não foi possível conectar: ' + e.message;
+    el.style.borderColor = 'rgba(255,82,82,.3)';
+  }
+}
+
+async function carregaAbas() {
+  if (!URL_GS) return;
+  try {
+    const r = await gs('getSheets', {});
+    const sel = document.getElementById('cfg-sheets');
+    const cur = localStorage.getItem('meta_dash_sheet') || 'Comercial';
+    if (r.sheets && r.sheets.length) {
+      sel.innerHTML = r.sheets.map(s => `<option value="${esc(s)}" ${s===cur?'selected':''}>${esc(s)}</option>`).join('');
+    }
+  } catch(e) {}
+}
+
+function salvaUrl() {
+  const url = document.getElementById('cfg-url').value.trim();
+  if (!url.startsWith('https://script.google.com')) {
+    toast('URL inválida', 'err'); return;
+  }
+  localStorage.setItem('meta_dash_url', url);
+  URL_GS = url;
+  toast('✅ URL salva!', 'ok');
+  checaStatus();
+  carregaAbas();
+  fechaConfig();
+  if (!ST.loaded) { carrega(); setInterval(carrega, 5*60*1000); }
+}
+
+async function salvaAba() {
+  const nome = document.getElementById('cfg-sheets').value;
+  if (!nome) return;
+  try {
+    await gs('setSheet', { name: nome });
+    localStorage.setItem('meta_dash_sheet', nome);
+    toast('Aba "' + nome + '" configurada', 'ok');
+    checaStatus();
+  } catch(e) { toast('Erro: '+e.message, 'err'); }
+}
+
+async function roda_diag() {
+  const el = document.getElementById('cfg-diag');
+  el.style.display = 'block'; el.textContent = 'Rodando…';
+  try {
+    const s = await gs('status', {});
+    el.textContent = JSON.stringify(s, null, 2);
+  } catch(e) { el.textContent = 'Erro: ' + e.message; }
 }
 
 // ============================================================
 // HELPERS
 // ============================================================
-function buildSummary(ads) {
-  const s = { spend:0, clicks:0, impressions:0, purchases:0, leads:0, purchase_value:0, reach:0, cpc:0, cpl:0, cpa:0, ctr:0, cpm:0 };
-  ads.forEach(ad => {
-    s.spend += ad.spend || 0;
-    s.clicks += ad.clicks || 0;
-    s.impressions += ad.impressions || 0;
-    s.purchases += ad.purchases || 0;
-    s.leads += ad.leads || 0;
-    s.purchase_value += ad.purchase_value || 0;
-    s.reach += ad.reach || 0;
+function somaAds(ads) {
+  const s = { gasto:0,cliques:0,impressoes:0,compras:0,leads:0,receita:0,alcance:0 };
+  ads.forEach(a => {
+    s.gasto      += a.gasto      || 0;
+    s.cliques    += a.cliques    || 0;
+    s.impressoes += a.impressoes || 0;
+    s.compras    += a.compras    || 0;
+    s.leads      += a.leads      || 0;
+    s.receita    += a.receita    || 0;
+    s.alcance    += a.alcance    || 0;
   });
-  s.cpc = s.clicks > 0 ? s.spend / s.clicks : 0;
-  s.cpl = s.leads > 0 ? s.spend / s.leads : 0;
-  s.cpa = s.purchases > 0 ? s.spend / s.purchases : 0;
-  s.ctr = s.impressions > 0 ? s.clicks / s.impressions * 100 : 0;
-  s.cpm = s.impressions > 0 ? s.spend / s.impressions * 1000 : 0;
+  s.cpc = s.cliques    > 0 ? s.gasto / s.cliques    : 0;
+  s.cpl = s.leads      > 0 ? s.gasto / s.leads      : 0;
+  s.cpa = s.compras    > 0 ? s.gasto / s.compras    : 0;
+  s.ctr = s.impressoes > 0 ? s.cliques / s.impressoes * 100 : 0;
+  s.cpm = s.impressoes > 0 ? s.gasto / s.impressoes * 1000  : 0;
   return s;
 }
 
-function sortAds(ads) {
-  const k = state.sortBy;
-  return [...ads].sort((a, b) => {
-    const av = parseFloat(a[k] || 0), bv = parseFloat(b[k] || 0);
-    return (bv - av) * state.sortDir;
-  });
+function ordena(ads) {
+  const k = ST.sortKey;
+  return [...ads].sort((a,b) => ((b[k]||0) - (a[k]||0)) * ST.sortDir);
 }
 
-function setSortBy(key) {
-  if (state.sortBy === key) state.sortDir *= -1;
-  else { state.sortBy = key; state.sortDir = -1; }
-  renderAdsTable(getFilteredAds());
+function setSortKey(k) {
+  if (ST.sortKey === k) ST.sortDir *= -1; else { ST.sortKey = k; ST.sortDir = -1; }
+  renderTabela(filtra());
 }
 
-function setRefreshing(yes) {
-  const icon = document.getElementById('refreshIcon');
-  if (yes) icon.classList.add('spin'); else icon.classList.remove('spin');
+function setCarregando(v) {
+  const ic = document.getElementById('ic-ref');
+  if (v) ic.classList.add('spin'); else ic.classList.remove('spin');
 }
 
-function fmtBRL(v) {
+function R$(v) {
   if (!v || isNaN(v)) return '—';
-  return 'R$ ' + parseFloat(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return 'R$ ' + (+v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-function fmtNum(v) {
-  if (!v) return '0';
-  return parseInt(v).toLocaleString('pt-BR');
-}
+function N(v) { return v ? (+v).toLocaleString('pt-BR') : '0'; }
+function fmtD(d) { return d.toISOString().split('T')[0]; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function trunc(s,n) { s=String(s||''); return s.length>n?s.slice(0,n)+'…':s; }
 function fmtStatus(s) {
-  const map = { ACTIVE: 'Ativo', PAUSED: 'Pausado', CAMPAIGN_PAUSED: 'Camp. Pausada', DISAPPROVED: 'Reprovado' };
-  return map[s] || s || '—';
-}
-function esc(str) {
-  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function truncate(str, n) {
-  if (!str) return '';
-  return str.length > n ? str.slice(0, n) + '…' : str;
+  const m = {ACTIVE:'Ativo',PAUSED:'Pausado',CAMPAIGN_PAUSED:'Camp. Pausada',ADSET_PAUSED:'AdSet Pausado',DISAPPROVED:'Reprovado',WITH_ISSUES:'Com erros'};
+  return m[s] || s || '—';
 }
 
-function showToast(msg, type = '') {
+function toast(msg, tipo) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove('show'), 3000);
+  t.className = 'toast ' + (tipo||'') + ' show';
+  setTimeout(() => t.classList.remove('show'), 3500);
 }
 </script>
 </body>
