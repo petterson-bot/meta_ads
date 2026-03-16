@@ -517,10 +517,17 @@ async function loadAll() {
       apiFetch('getCreativesAnalysis', { since, until })
     ]);
 
-    state.ads = adsData.ads || [];
+    state.ads = Array.isArray(adsData.ads) ? adsData.ads : [];
     state.summary = adsData.summary || {};
-    state.comercial = comercialData || {};
-    state.creatives = creativesData.creatives || [];
+    // Normalize comercial: garante que .data seja sempre array
+    const rawComercial = comercialData || {};
+    state.comercial = {
+      ...rawComercial,
+      data: Array.isArray(rawComercial.data) ? rawComercial.data : [],
+      total_sales: rawComercial.total_sales || 0,
+      total_revenue: rawComercial.total_revenue || 0
+    };
+    state.creatives = Array.isArray(creativesData.creatives) ? creativesData.creatives : [];
     state.loaded = true;
 
     renderAll();
@@ -552,11 +559,11 @@ function apiFetch(action, params = {}) {
 // ============================================================
 function renderAll() {
   const filtered = getFilteredAds();
-  renderSummaryCards(filtered);
-  renderCharts(filtered);
-  renderAdsTable(filtered);
-  renderComercial();
-  renderCreatives();
+  try { renderSummaryCards(filtered); } catch(e) { console.warn('renderSummaryCards:', e); }
+  try { renderCharts(filtered); }      catch(e) { console.warn('renderCharts:', e); }
+  try { renderAdsTable(filtered); }    catch(e) { console.warn('renderAdsTable:', e); }
+  try { renderComercial(); }           catch(e) { console.warn('renderComercial:', e); document.getElementById('comercialContent').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div>Erro ao carregar comercial: ${e.message}</div></div>`; }
+  try { renderCreatives(); }           catch(e) { console.warn('renderCreatives:', e); }
 }
 
 function getFilteredAds() {
@@ -807,7 +814,7 @@ function renderAdsTable(ads) {
 // COMERCIAL
 // ============================================================
 function renderComercial() {
-  const c = state.comercial;
+  const c = state.comercial || {};
   const container = document.getElementById('comercialContent');
 
   if (c.error) {
@@ -819,7 +826,9 @@ function renderComercial() {
   const totalRevenue = c.total_revenue || 0;
   const avgTicket = totalSales > 0 ? totalRevenue / totalSales : 0;
 
-  const rows = (c.data || []).slice(0, 50);
+  // Garante que data é sempre um array, independente do que vier do servidor
+  const rawData = c.data;
+  const rows = (Array.isArray(rawData) ? rawData : []).slice(0, 50);
 
   container.innerHTML = `
     <div class="comercial-summary">
