@@ -197,7 +197,7 @@ hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
     <div class="cfg-sec">
       <div class="cfg-lbl">URL do Apps Script (Web App)</div>
       <div class="cfg-hint">Apps Script → Implantar → Gerenciar → copie a URL <strong>/exec</strong></div>
-      <input id="cfg-url" class="cfg-inp" type="url" placeholder="https://script.google.com/macros/s/AKfycbxbnmdSrp3kwZ2jL8Me7yCUrYpRWvU_OoVIyXpO-9x5nC40s7MpdaliYJQF_KS4wkTTwg/exec">
+      <input id="cfg-url" class="cfg-inp" type="url" placeholder="https://script.google.com/macros/s/AKfycbyaiHwBTQH8fGWfZ8WjVIibuUawr2MAW25Dljdkp5r7YXEMsgJ7FuIRUFcb9u_NuX-cOg/exec">
       <button class="cfg-btn acc" onclick="salvaUrl()">💾 Salvar URL e Conectar</button>
     </div>
 
@@ -319,6 +319,17 @@ document.addEventListener('DOMContentLoaded', () => {
   initDatas();
   initTabs();
   initFiltros();
+
+  // Se estiver sendo servido PELO Apps Script (via /exec), usa a própria URL como base
+  const currentUrl = window.location.href;
+  if (currentUrl.includes('script.google.com') && !URL_GS) {
+    // Remove parâmetros e usa a URL base como endpoint
+    const base = currentUrl.split('?')[0].split('#')[0];
+    URL_GS = base;
+    localStorage.setItem('meta_dash_url', URL_GS);
+    if (document.getElementById('cfg-url')) document.getElementById('cfg-url').value = URL_GS;
+  }
+
   if (URL_GS) {
     carrega();
     setInterval(carrega, 5 * 60 * 1000);
@@ -413,12 +424,36 @@ async function carrega() {
 function gs(action, params) {
   if (!URL_GS) return Promise.reject(new Error('URL não configurada'));
   const qs = new URLSearchParams({ action, ...params }).toString();
-  return fetch(URL_GS + '?' + qs)
-    .then(r => {
-      const ct = r.headers.get('content-type') || '';
-      if (!ct.includes('json')) throw new Error('Apps Script retornou HTML. Verifique: 1) Deploy atualizado 2) Acesso "Anyone"');
-      return r.json();
+  const url = URL_GS + '?' + qs;
+
+  // Timeout de 90 segundos (Apps Script pode demorar com muitos ads)
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Timeout: Apps Script demorou mais de 90s')), 90000)
+  );
+
+  const req = fetch(url, {
+    method: 'GET',
+    redirect: 'follow',
+    cache: 'no-cache'
+  }).then(r => {
+    // Apps Script redireciona para login se acesso não for "Anyone"
+    if (r.url && r.url.includes('accounts.google.com')) {
+      throw new Error('Apps Script requer login. Verifique: Deploy → "Quem tem acesso: Qualquer pessoa"');
+    }
+    return r.text().then(text => {
+      // Tenta parsear JSON — se vier HTML é porque deploy está errado
+      try {
+        return JSON.parse(text);
+      } catch(e) {
+        if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+          throw new Error('Apps Script retornou HTML. Publique como Web App com acesso "Qualquer pessoa" e crie uma nova versão do deploy.');
+        }
+        throw new Error('Resposta inválida: ' + text.substring(0, 100));
+      }
     });
+  });
+
+  return Promise.race([req, timeout]);
 }
 
 // ============================================================
