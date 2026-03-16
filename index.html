@@ -94,6 +94,11 @@ tr:nth-child(even){background:var(--c2)}tr:hover{background:rgba(74,229,74,.03)}
 .config-panel input:focus,.config-panel textarea:focus{border-color:var(--n)}
 .config-panel button{background:var(--n);color:var(--bg);border:none;padding:8px 16px;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer}
 
+/* SHEET STATUS */
+.sheet-status{font-size:10px;padding:4px 8px;border-radius:4px;margin-left:8px}
+.sheet-ok{color:var(--n);background:rgba(74,229,74,.1)}
+.sheet-err{color:var(--r);background:rgba(255,68,68,.1)}
+
 /* MOBILE */
 @media(max-width:768px){
   .sidebar{width:56px;min-width:56px}
@@ -222,23 +227,21 @@ function App() {
   // Spreadsheet config
   const [sheetUrl, setSheetUrl] = useState(localStorage.getItem('sda_sheet_url') || '');
   const [sheetData, setSheetData] = useState(null);
+  const [sheetError, setSheetError] = useState('');
   
-  // ===== LOAD DATA =====
+  // ===== LOAD META DATA =====
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const accId = ACCOUNTS[account];
       
-      // Account insights
       const accInsights = await fetchAccountInsights(accId, datePreset);
       setAccountData(accInsights.data?.[0] || null);
       
-      // Campaigns
       const campsRes = await fetchCampaigns(accId);
       const camps = campsRes.data || [];
       setCampaigns(camps);
       
-      // Fetch insights for each campaign
       const insights = {};
       for (const c of camps.slice(0, 25)) {
         const ci = await fetchCampaignInsights(c.id, datePreset);
@@ -246,11 +249,9 @@ function App() {
       }
       setCampaignInsights(insights);
       
-      // Adsets
       const adsetsRes = await fetchAdsets(accId);
       setAdsets(adsetsRes.data || []);
       
-      // Ads
       const adsRes = await fetchAds(accId);
       setAds(adsRes.data || []);
       
@@ -259,16 +260,46 @@ function App() {
     }
     setLoading(false);
   }, [account, datePreset]);
-  
-  const loadSheet = useCallback(async () => {
+
+  // ===== LOAD SHEET (CORRIGIDO — JSONP para evitar CORS) =====
+  const loadSheet = useCallback(() => {
     if (!sheetUrl) return;
-    try {
-      const res = await fetch(sheetUrl + '?action=all');
-      const data = await res.json();
-      setSheetData(data);
-    } catch(e) {
-      console.error('Sheet error:', e);
-    }
+    setSheetError('');
+
+    const callbackName = 'sdaSheetCallback_' + Date.now();
+    const script = document.createElement('script');
+
+    const timeout = setTimeout(() => {
+      setSheetError('Timeout — verifique a URL do Apps Script');
+      document.head.removeChild(script);
+      delete window[callbackName];
+    }, 15000);
+
+    window[callbackName] = function(response) {
+      clearTimeout(timeout);
+      try {
+        document.head.removeChild(script);
+      } catch(e) {}
+      delete window[callbackName];
+
+      if (response && response.success) {
+        setSheetData(response.data);
+        setSheetError('');
+      } else {
+        setSheetError(response?.error || 'Erro desconhecido ao carregar planilha');
+        console.error('Sheet error:', response);
+      }
+    };
+
+    script.onerror = function() {
+      clearTimeout(timeout);
+      setSheetError('Erro ao carregar — URL inválida ou implantação incorreta');
+      delete window[callbackName];
+    };
+
+    const sep = sheetUrl.includes('?') ? '&' : '?';
+    script.src = sheetUrl + sep + 'action=all&callback=' + callbackName;
+    document.head.appendChild(script);
   }, [sheetUrl]);
   
   useEffect(() => { loadData(); }, [loadData]);
@@ -364,6 +395,8 @@ function App() {
             <option value="last_month">Mês passado</option>
           </select>
           <button className="refresh-btn" onClick={loadData}>🔄 Atualizar</button>
+          {sheetData && <span className="sheet-status sheet-ok">✅ Planilha</span>}
+          {sheetError && <span className="sheet-status sheet-err" title={sheetError}>❌ Planilha</span>}
         </div>
         
         <div className="content">
@@ -396,7 +429,7 @@ function App() {
           
           {/* VENDAS */}
           {page === 'vendas' && (
-            <VendasPage sheet={sheetData} onConfig={() => setPage('config')} />
+            <VendasPage sheet={sheetData} sheetError={sheetError} onConfig={() => setPage('config')} />
           )}
           
           {/* CLOSERS */}
@@ -406,7 +439,13 @@ function App() {
           
           {/* CONFIG */}
           {page === 'config' && (
-            <ConfigPage sheetUrl={sheetUrl} setSheetUrl={(u) => {setSheetUrl(u); localStorage.setItem('sda_sheet_url', u)}} onLoad={loadSheet} />
+            <ConfigPage
+              sheetUrl={sheetUrl}
+              setSheetUrl={(u) => {setSheetUrl(u); localStorage.setItem('sda_sheet_url', u)}}
+              onLoad={loadSheet}
+              sheetData={sheetData}
+              sheetError={sheetError}
+            />
           )}
         </div>
       </div>
@@ -426,6 +465,7 @@ function DashboardPage({ data, campaigns, insights, sheet }) {
   const purchases = extractAction(data.actions, 'purchase');
   const checkouts = extractAction(data.actions, 'initiate_checkout');
   
+  // sheetData já vem como o objeto interno { resumo, canais, ... }
   const resumo = sheet?.resumo;
   
   return (
@@ -438,7 +478,7 @@ function DashboardPage({ data, campaigns, insights, sheet }) {
         <div className="kpi"><div className="label">Leads</div><div className="value" style={{color:'var(--n)'}}>{fmt(leads)}</div><div className="sub">CPL: {leads > 0 ? fmtR(spend/leads) : '-'}</div></div>
         <div className="kpi"><div className="label">Compras Pixel</div><div className="value" style={{color:'var(--p)'}}>{fmt(purchases)}</div><div className="sub">CPA: {purchases > 0 ? fmtR(spend/purchases) : '-'}</div></div>
         {resumo && <div className="kpi"><div className="label">Vendas Reais</div><div className="value" style={{color:'var(--n)'}}>{fmt(resumo.totalVendas)}</div><div className="sub">{fmtR(resumo.totalReceita)}</div></div>}
-        {resumo && <div className="kpi"><div className="label">ROAS Real</div><div className="value" style={{color:'var(--y)'}}>{(resumo.totalReceita / spend).toFixed(2)}x</div></div>}
+        {resumo && spend > 0 && <div className="kpi"><div className="label">ROAS Real</div><div className="value" style={{color:'var(--y)'}}>{(resumo.totalReceita / spend).toFixed(2)}x</div></div>}
       </div>
       
       <div className="card">
@@ -450,7 +490,7 @@ function DashboardPage({ data, campaigns, insights, sheet }) {
               {campaigns.filter(c => c.status === 'ACTIVE').map(c => {
                 const ci = insights[c.id];
                 return (
-                  <tr key={c.id} style={{cursor:'pointer'}} onClick={() => window.location.hash = ''}>
+                  <tr key={c.id}>
                     <td style={{maxWidth:'220px',overflow:'hidden',textOverflow:'ellipsis'}} title={c.name}>{c.name.replace('SDA2026-Meta_','')}</td>
                     <td><span className="tag tag-g">ATIVO</span></td>
                     <td className="mono">{ci ? fmtR(ci.spend) : '-'}</td>
@@ -609,11 +649,12 @@ function DetailPage({ item, insights }) {
 }
 
 // ===== VENDAS PAGE =====
-function VendasPage({ sheet, onConfig }) {
+function VendasPage({ sheet, sheetError, onConfig }) {
   if (!sheet) return (
     <div className="card" style={{textAlign:'center',padding:40}}>
       <div style={{fontSize:40,marginBottom:10}}>💰</div>
       <div style={{fontSize:14,fontWeight:700,color:'var(--y)',marginBottom:6}}>Conecte a Planilha Comercial</div>
+      {sheetError && <div style={{fontSize:11,color:'var(--r)',marginBottom:10,background:'rgba(255,68,68,.08)',padding:'8px 12px',borderRadius:6}}>{sheetError}</div>}
       <div style={{fontSize:12,color:'var(--t2)',marginBottom:14}}>Configure a URL do Apps Script em ⚙️ Configurar para ver vendas em tempo real</div>
       <button className="refresh-btn" onClick={onConfig} style={{fontSize:12,padding:'8px 16px'}}>⚙️ Configurar Agora</button>
     </div>
@@ -720,20 +761,26 @@ function ClosersPage({ sheet, onConfig }) {
 }
 
 // ===== CONFIG PAGE =====
-function ConfigPage({ sheetUrl, setSheetUrl, onLoad }) {
+function ConfigPage({ sheetUrl, setSheetUrl, onLoad, sheetData, sheetError }) {
   return (
     <>
       <div className="card-title" style={{marginBottom:12}}>⚙️ Configuração</div>
       <div className="config-panel">
         <label>URL do Apps Script (Planilha Comercial)</label>
-        <input placeholder="https://script.google.com/macros/s/AK.../exec" value={sheetUrl} onChange={e => setSheetUrl(e.target.value)} />
+        <input
+          placeholder="https://script.google.com/macros/s/AK.../exec"
+          value={sheetUrl}
+          onChange={e => setSheetUrl(e.target.value)}
+        />
+        {sheetData && <p style={{fontSize:11,color:'var(--n)',fontWeight:600,marginBottom:8}}>✅ Planilha conectada com sucesso</p>}
+        {sheetError && <p style={{fontSize:11,color:'var(--r)',marginBottom:8}}>❌ {sheetError}</p>}
         <p style={{fontSize:10,color:'var(--t3)',marginBottom:12}}>
           1. Abra a planilha Comercial_SDA_2026<br/>
-          2. Vá em Extensões → Apps Script<br/>
-          3. Cole o código do arquivo <strong>AppsScript_API_Comercial.js</strong><br/>
-          4. Implantação → Nova implantação → App da Web<br/>
-          5. Executar como: Eu / Acesso: Qualquer pessoa<br/>
-          6. Copie a URL e cole aqui
+          2. Extensões → Apps Script → cole o código AppsScript_API_Comercial_v3.js<br/>
+          3. Implantação → Nova implantação → App da Web<br/>
+          4. Executar como: <strong>Eu</strong> / Acesso: <strong>Qualquer pessoa</strong><br/>
+          5. Copie a URL gerada e cole aqui<br/>
+          6. Clique em Conectar Planilha
         </p>
         <button onClick={onLoad}>🔗 Conectar Planilha</button>
       </div>
