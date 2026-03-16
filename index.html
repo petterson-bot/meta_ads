@@ -260,23 +260,72 @@ tbody tr:hover .ad-link { opacity: 1; }
 <body>
 
 <!-- CONFIG MODAL -->
-<div id="configModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;">
-  <div style="background:#1c1c28;border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:32px;width:90%;max-width:520px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">⚙️ Configurar Dashboard</div>
-    <div style="font-size:13px;color:#8888aa;margin-bottom:20px;">Cole abaixo a URL do seu Apps Script publicado como Web App.</div>
-    <div style="font-size:11px;color:#6c6fff;background:rgba(108,111,255,0.1);border-radius:8px;padding:12px;margin-bottom:16px;font-family:monospace;">
-      Como obter a URL:<br>
-      1. No Apps Script → Deploy → Manage Deployments<br>
-      2. Copie a URL que termina em <strong>/exec</strong>
+<!-- ===== MODAL CONFIG COMPLETO ===== -->
+<div id="configModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;overflow-y:auto;padding:20px;">
+  <div style="background:#1c1c28;border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:28px;width:100%;max-width:560px;position:relative;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-size:17px;font-weight:600;">⚙️ Configurações do Dashboard</div>
+      <button onclick="document.getElementById('configModal').style.display='none'" style="background:transparent;border:none;color:#8888aa;font-size:18px;cursor:pointer;padding:4px;">✕</button>
     </div>
-    <input id="configUrl" type="url" placeholder="https://script.google.com/macros/s/AKfycb.../exec"
-      style="width:100%;padding:10px 14px;background:#111118;border:1px solid rgba(255,255,255,0.15);color:#f0f0f8;border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:14px;outline:none;">
-    <button onclick="saveConfig()" style="width:100%;padding:10px;background:#6c6fff;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">
-      Salvar e Conectar
+
+    <!-- STATUS -->
+    <div id="configStatus" style="margin-bottom:20px;padding:12px;border-radius:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);font-size:12px;color:#8888aa;">
+      Verificando status...
+    </div>
+
+    <!-- SEÇÃO 1: URL DO SCRIPT -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:600;color:#cccce8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">1. URL do Apps Script</div>
+      <div style="font-size:11px;color:#6c6fff;background:rgba(108,111,255,0.08);border-radius:6px;padding:10px;margin-bottom:10px;line-height:1.6;">
+        Apps Script → Implantar → Gerenciar implantações → copie a URL <strong>/exec</strong>
+      </div>
+      <input id="configUrl" type="url" placeholder="https://script.google.com/macros/s/AKfycb.../exec"
+        style="width:100%;padding:10px 12px;background:#111118;border:1px solid rgba(255,255,255,0.15);color:#f0f0f8;border-radius:8px;font-size:12px;font-family:monospace;outline:none;margin-bottom:8px;">
+      <button onclick="saveScriptUrl()" style="width:100%;padding:9px;background:#6c6fff;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+        💾 Salvar URL
+      </button>
+    </div>
+
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:0 0 20px;">
+
+    <!-- SEÇÃO 2: TOKEN META -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:600;color:#cccce8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">2. Token Meta (salvo no Apps Script)</div>
+      <div style="font-size:11px;color:#f5a623;background:rgba(245,166,35,0.08);border-radius:6px;padding:10px;margin-bottom:10px;line-height:1.6;">
+        ⚠️ O token precisa ser salvo no Apps Script.<br>
+        No editor do Apps Script, edite a função <strong>setupToken()</strong>, cole seu token e execute-a.<br>
+        Ou cole abaixo para salvar via dashboard:
+      </div>
+      <input id="configToken" type="password" placeholder="EAARxmUt4bAcBQgkDZBP9bsxJZCoU8jX60EpnbDmvON5elPvADLBP6gOGkeRUHDLRVvhNrIHF2ej74i7FQlCyU7YWgqM9Q8iwZCBiBZCB9KLisUq0L40NIYxfXuXfz8qt1ZCRjie2tYafH2NmrQk9XLdyoQuhJZA5M2w8GnQZAhijiAROADhgXxgMrsz5OSOsZCOZAE3x25F1BKbYT9hiBF1zk0yrOSskfkweZCSkuXvvdlvXBey3ZBB7PG7v9L5uDnxd4rtcZCcfgZAqCo1eUawjUXsNotcczpj8Dafh3QApZBe0ZCptHZAwLZCPisEBfXnUQYgxhtfZBF9oR9YJp6"
+        style="width:100%;padding:10px 12px;background:#111118;border:1px solid rgba(255,255,255,0.15);color:#f0f0f8;border-radius:8px;font-size:12px;font-family:monospace;outline:none;margin-bottom:8px;">
+      <button onclick="saveMetaToken()" style="width:100%;padding:9px;background:#1edb8c;color:#0a0a0f;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+        🔑 Salvar Token no Apps Script
+      </button>
+      <div style="font-size:11px;color:#8888aa;margin-top:6px;">
+        Onde gerar o token: <a href="https://developers.facebook.com/tools/explorer/" target="_blank" style="color:#6c6fff;">Meta Graph Explorer</a> · permissões: ads_read, ads_management
+      </div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:0 0 20px;">
+
+    <!-- SEÇÃO 3: ABA COMERCIAL -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:600;color:#cccce8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">3. Aba da Planilha Comercial</div>
+      <div style="display:flex;gap:8px;">
+        <select id="sheetSelect" style="flex:1;padding:9px 12px;background:#111118;border:1px solid rgba(255,255,255,0.15);color:#f0f0f8;border-radius:8px;font-size:12px;font-family:inherit;outline:none;">
+          <option value="">Carregando abas...</option>
+        </select>
+        <button onclick="saveSheet()" style="padding:9px 16px;background:#38bdf8;color:#0a0a0f;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">
+          Salvar
+        </button>
+      </div>
+    </div>
+
+    <!-- DIAGNÓSTICO -->
+    <button onclick="runDiagnosis()" style="width:100%;padding:9px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#8888aa;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;">
+      🔍 Rodar Diagnóstico Completo
     </button>
-    <div style="text-align:center;margin-top:12px;">
-      <a href="#" onclick="document.getElementById('configModal').style.display='none'" style="font-size:12px;color:#8888aa;">Fechar (usar depois)</a>
-    </div>
+    <div id="diagResult" style="display:none;margin-top:12px;padding:12px;background:rgba(0,0,0,0.3);border-radius:8px;font-size:11px;font-family:monospace;color:#8888aa;white-space:pre-wrap;max-height:200px;overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -296,7 +345,7 @@ tbody tr:hover .ad-link { opacity: 1; }
   <div class="header-right">
     <div class="live-badge"><div class="live-dot"></div>Live</div>
     <div class="last-update" id="lastUpdate">Aguardando dados…</div>
-    <button onclick="document.getElementById('configModal').style.display='flex'" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:#8888aa;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit;">⚙️ Config</button>
+    <button onclick="openConfig()" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:#8888aa;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit;">⚙️ Config</button>
   </div>
 </header>
 
@@ -398,27 +447,136 @@ tbody tr:hover .ad-link { opacity: 1; }
 
 <script>
 // ============================================================
-// CONFIGURAÇÃO — cole aqui a URL do seu Apps Script Web App
-// Exemplo: https://script.google.com/macros/s/AKfycb.../exec
+// ============================================================
+// CONFIG
 // ============================================================
 let SCRIPT_URL = localStorage.getItem('meta_dash_url') || 'NOT_SET';
 
-// Mostra modal de config se URL não definida
 function checkConfig() {
+  // Preenche URL salva no input
+  const saved = localStorage.getItem('meta_dash_url');
+  if (saved) document.getElementById('configUrl').value = saved;
+
   if (SCRIPT_URL === 'NOT_SET') {
     document.getElementById('configModal').style.display = 'flex';
+    loadSheetOptions();
   }
+  loadConfigStatus();
 }
-function saveConfig() {
+
+function openConfig() {
+  const saved = localStorage.getItem('meta_dash_url');
+  if (saved) document.getElementById('configUrl').value = saved;
+  document.getElementById('configModal').style.display = 'flex';
+  loadConfigStatus();
+  loadSheetOptions();
+}
+
+function saveScriptUrl() {
   const url = document.getElementById('configUrl').value.trim();
   if (!url.startsWith('https://script.google.com')) {
-    alert('URL inválida. Deve começar com https://script.google.com');
+    showToast('URL inválida — deve começar com https://script.google.com', 'error');
     return;
   }
   localStorage.setItem('meta_dash_url', url);
   SCRIPT_URL = url;
-  document.getElementById('configModal').style.display = 'none';
-  loadAll();
+  showToast('URL salva!', 'success');
+  loadConfigStatus();
+  loadSheetOptions();
+  if (state.loaded === false) { loadAll(); setInterval(loadAll, 5 * 60 * 1000); }
+}
+
+async function saveMetaToken() {
+  const token = document.getElementById('configToken').value.trim();
+  if (!token || token.length < 20) {
+    showToast('Token muito curto ou vazio', 'error');
+    return;
+  }
+  if (SCRIPT_URL === 'NOT_SET') {
+    showToast('Configure a URL do Apps Script primeiro', 'error');
+    return;
+  }
+  try {
+    const r = await apiFetch('saveToken', { token });
+    if (r.valid) {
+      showToast('✅ Token salvo e validado! Conectado como: ' + (r.user || ''), 'success');
+      document.getElementById('configToken').value = '';
+      loadConfigStatus();
+      loadAll();
+    } else {
+      showToast('Token salvo mas inválido: ' + (r.error || ''), 'error');
+    }
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
+}
+
+async function loadConfigStatus() {
+  const el = document.getElementById('configStatus');
+  if (!el) return;
+  if (SCRIPT_URL === 'NOT_SET') {
+    el.innerHTML = '⚠️ URL do Apps Script não configurada';
+    el.style.borderColor = 'rgba(245,166,35,0.4)';
+    return;
+  }
+  el.innerHTML = '⏳ Verificando conexão...';
+  try {
+    const s = await apiFetch('getStatus');
+    const tokenOk = s.meta_api_ok ? '✅' : '❌';
+    const tokenMsg = s.meta_api_ok
+      ? `Token OK · Conectado como <strong>${s.meta_user || 'N/A'}</strong>`
+      : `Token inválido: ${s.meta_error || 'erro desconhecido'}`;
+    el.innerHTML = `
+      <div style="margin-bottom:6px">🔗 Apps Script: <span style="color:#1edb8c">Conectado</span></div>
+      <div style="margin-bottom:4px">${tokenOk} Meta API: ${tokenMsg}</div>
+      <div>📋 Aba comercial: <strong>${s.sheet_name}</strong></div>
+    `;
+    el.style.borderColor = s.meta_api_ok ? 'rgba(30,219,140,0.3)' : 'rgba(255,87,87,0.3)';
+  } catch(e) {
+    el.innerHTML = '❌ Erro ao conectar com Apps Script: ' + e.message;
+    el.style.borderColor = 'rgba(255,87,87,0.3)';
+  }
+}
+
+async function loadSheetOptions() {
+  if (SCRIPT_URL === 'NOT_SET') return;
+  try {
+    const r = await apiFetch('getSheets');
+    const sel = document.getElementById('sheetSelect');
+    const current = localStorage.getItem('meta_dash_sheetname') || 'Comercial';
+    if (r.sheets && r.sheets.length > 0) {
+      sel.innerHTML = r.sheets.map(s =>
+        `<option value="${s}" ${s === current ? 'selected' : ''}>${s}</option>`
+      ).join('');
+    } else {
+      sel.innerHTML = '<option value="">Nenhuma aba encontrada</option>';
+    }
+  } catch(e) { /* ignore */ }
+}
+
+async function saveSheet() {
+  const name = document.getElementById('sheetSelect').value;
+  if (!name) return;
+  try {
+    await apiFetch('setSheet', { name });
+    localStorage.setItem('meta_dash_sheetname', name);
+    showToast('Aba comercial: "' + name + '" configurada', 'success');
+    loadConfigStatus();
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
+}
+
+async function runDiagnosis() {
+  const el = document.getElementById('diagResult');
+  el.style.display = 'block';
+  el.textContent = 'Rodando diagnóstico...';
+  try {
+    const s = await apiFetch('getStatus');
+    el.textContent = JSON.stringify(s, null, 2);
+  } catch(e) {
+    el.textContent = 'Erro: ' + e.message;
+  }
 }
 
 // ============================================================
@@ -506,36 +664,59 @@ function setupFilters() {
 // LOAD DATA
 // ============================================================
 async function loadAll() {
+  if (SCRIPT_URL === 'NOT_SET') {
+    showToast('Configure a URL do Apps Script primeiro', 'error');
+    return;
+  }
   setRefreshing(true);
   try {
     const since = document.getElementById('filterSince').value;
     const until = document.getElementById('filterUntil').value;
+    const account = document.getElementById('filterAccount').value;
 
     const [adsData, comercialData, creativesData] = await Promise.all([
-      apiFetch('getAdsData', { since, until }),
+      apiFetch('getAdsData', { since, until, account }),
       apiFetch('getComercial'),
       apiFetch('getCreativesAnalysis', { since, until })
     ]);
 
+    // Token não configurado — abre config
+    if (adsData.error === 'TOKEN_NOT_SET') {
+      showToast('⚠️ Token Meta não configurado — veja as Configurações', 'error');
+      openConfig();
+      setRefreshing(false);
+      return;
+    }
+
     state.ads = Array.isArray(adsData.ads) ? adsData.ads : [];
     state.summary = adsData.summary || {};
-    // Normalize comercial: garante que .data seja sempre array
-    const rawComercial = comercialData || {};
+
+    const rawComercial = (typeof comercialData === 'object' && comercialData !== null) ? comercialData : {};
     state.comercial = {
       ...rawComercial,
       data: Array.isArray(rawComercial.data) ? rawComercial.data : [],
-      total_sales: rawComercial.total_sales || 0,
-      total_revenue: rawComercial.total_revenue || 0
+      total_sales: Number(rawComercial.total_sales) || 0,
+      total_revenue: Number(rawComercial.total_revenue) || 0
     };
     state.creatives = Array.isArray(creativesData.creatives) ? creativesData.creatives : [];
     state.loaded = true;
 
+    // Mostra erros parciais sem travar
+    if (adsData.errors && adsData.errors.length > 0) {
+      console.warn('Erros parciais:', adsData.errors);
+    }
+
     renderAll();
     document.getElementById('lastUpdate').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
-    showToast('Dados atualizados com sucesso', 'success');
+    const adCount = state.ads.length;
+    showToast(adCount > 0 ? `${adCount} anúncios carregados` : 'Sem dados para o período', adCount > 0 ? 'success' : '');
   } catch (err) {
-    showToast('Erro ao carregar dados: ' + err.message, 'error');
-    console.error(err);
+    console.error('loadAll error:', err);
+    if (err.message.includes('não configurada') || err.message.includes('NOT_SET')) {
+      openConfig();
+    } else {
+      showToast('Erro: ' + err.message, 'error');
+    }
   }
   setRefreshing(false);
 }
