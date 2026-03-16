@@ -300,10 +300,14 @@ hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
 
 <script>
 // ============================================================
-// CONFIG — apenas a URL do Apps Script é necessária aqui
-// Token e tudo mais está no Code.gs (MktConnector)
+// CONFIG
+// Token está no Code.gs (MktConnector) — aqui só a URL
 // ============================================================
 let URL_GS = localStorage.getItem('meta_dash_url') || '';
+
+// Detecta se está rodando DE DENTRO do Apps Script (/exec)
+// Nesse caso usa google.script.run (sem CORS) em vez de fetch
+const DENTRO_GAS = (typeof google !== 'undefined' && google.script && google.script.run);
 
 // Estado global
 const ST = {
@@ -330,7 +334,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('cfg-url')) document.getElementById('cfg-url').value = URL_GS;
   }
 
-  if (URL_GS) {
+  // Dentro do GAS: carrega direto (sem CORS, sem URL)
+  // Fora do GAS: precisa da URL configurada
+  if (DENTRO_GAS || URL_GS) {
     carrega();
     setInterval(carrega, 5 * 60 * 1000);
   } else {
@@ -381,7 +387,7 @@ function initFiltros() {
 // CARREGAR DADOS
 // ============================================================
 async function carrega() {
-  if (!URL_GS) { toast('Configure a URL do Apps Script — clique em ⚙️ Config','err'); abreConfig(); return; }
+  if (!DENTRO_GAS && !URL_GS) { toast('Configure a URL do Apps Script — clique em ⚙️ Config','err'); abreConfig(); return; }
   setCarregando(true);
   try {
     const since   = document.getElementById('f-since').value;
@@ -422,36 +428,36 @@ async function carrega() {
 }
 
 function gs(action, params) {
+  // === MODO 1: Dentro do Apps Script — usa google.script.run (sem CORS) ===
+  if (DENTRO_GAS) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(e => reject(new Error(e.message || String(e))))
+        .handleActionFromHtml(action, params);
+    });
+  }
+
+  // === MODO 2: Externo — fetch com URL configurada ===
   if (!URL_GS) return Promise.reject(new Error('URL não configurada'));
+
   const qs = new URLSearchParams({ action, ...params }).toString();
   const url = URL_GS + '?' + qs;
 
-  // Timeout de 90 segundos (Apps Script pode demorar com muitos ads)
   const timeout = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('Timeout: Apps Script demorou mais de 90s')), 90000)
+    setTimeout(() => reject(new Error('Timeout 90s — Apps Script demorou demais')), 90000)
   );
 
-  const req = fetch(url, {
-    method: 'GET',
-    redirect: 'follow',
-    cache: 'no-cache'
-  }).then(r => {
-    // Apps Script redireciona para login se acesso não for "Anyone"
-    if (r.url && r.url.includes('accounts.google.com')) {
-      throw new Error('Apps Script requer login. Verifique: Deploy → "Quem tem acesso: Qualquer pessoa"');
-    }
-    return r.text().then(text => {
-      // Tenta parsear JSON — se vier HTML é porque deploy está errado
-      try {
-        return JSON.parse(text);
-      } catch(e) {
-        if (text.includes('<!DOCTYPE') || text.includes('<html')) {
-          throw new Error('Apps Script retornou HTML. Publique como Web App com acesso "Qualquer pessoa" e crie uma nova versão do deploy.');
-        }
-        throw new Error('Resposta inválida: ' + text.substring(0, 100));
+  const req = fetch(url, { method:'GET', redirect:'follow', cache:'no-cache' })
+    .then(r => r.text())
+    .then(text => {
+      try { return JSON.parse(text); }
+      catch(e) {
+        if (text.includes('<!DOCTYPE') || text.includes('<html'))
+          throw new Error('Apps Script retornou HTML. Verifique: Deploy → Acesso "Qualquer pessoa"');
+        throw new Error('Resposta inválida: ' + text.substring(0,120));
       }
     });
-  });
 
   return Promise.race([req, timeout]);
 }
