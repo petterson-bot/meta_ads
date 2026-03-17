@@ -197,7 +197,7 @@ hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
     <div class="cfg-sec">
       <div class="cfg-lbl">URL do Apps Script (Web App)</div>
       <div class="cfg-hint">Cole a URL do Apps Script da planilha para cruzar dados comerciais. Se não tiver, o dashboard funciona normalmente com os dados da Meta.</div>
-      <input id="cfg-url" class="cfg-inp" type="url" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+      <input id="cfg-url" class="cfg-inp" type="url" placeholder="https://script.google.com/macros/s/AKfycbyXAioibU0Fpf7P6jLWTbM7xWjbLEcYBuHvyGbBNqWNagvw5cIdNfJiGkF5i4g4CW5Vhg/exec">
       <button class="cfg-btn acc" onclick="salvaUrl()">💾 Salvar URL e Conectar</button>
     </div>
 
@@ -225,6 +225,7 @@ hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
   <div class="hd-right">
     <div class="live-pill"><div class="live-dot"></div>Live</div>
     <div class="upd" id="upd-txt">Aguardando…</div>
+    <div id="gas-badge" style="display:none;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(29,218,138,0.1);color:var(--grn);border:1px solid rgba(29,218,138,0.25);">📋 Comercial</div>
     <button class="btn-cfg" onclick="abreConfig()">⚙️ Config</button>
   </div>
 </header>
@@ -392,7 +393,13 @@ async function carrega() {
 
     // Comercial — chama Apps Script (só para planilha)
     document.getElementById('upd-txt').textContent = 'Carregando comercial...';
-    const comData = URL_GS ? await gsComercial() : { data:[], total_vendas:0, receita_total:0 };
+    const comData = URL_GS ? await gsComercial() : { data:[], total_vendas:0, receita_total:0, _sem_gas: true };
+    const gasBadge = document.getElementById('gas-badge');
+    if (gasBadge) {
+      if (comData._sem_gas) { gasBadge.style.display = 'none'; }
+      else if (comData.error) { gasBadge.style.display = 'flex'; gasBadge.textContent = '⚠️ Comercial'; gasBadge.style.color = 'var(--amb)'; gasBadge.style.background = 'rgba(245,166,35,0.1)'; gasBadge.style.borderColor = 'rgba(245,166,35,0.25)'; }
+      else { gasBadge.style.display = 'flex'; gasBadge.textContent = '📋 ' + (comData.total_vendas||0) + ' vendas'; }
+    }
     ST.comercial = {
       data:          Array.isArray(comData.data)   ? comData.data   : [],
       total_vendas:  comData.total_vendas  || 0,
@@ -569,9 +576,25 @@ function montaLinhaJS(ad, ins, contaNome, contaId, camp, thumb, storyId) {
 
 // Apps Script — APENAS para planilha Comercial
 function gsComercial() {
-  if (!URL_GS) return Promise.resolve({ data:[], total_vendas:0, receita_total:0 });
+  if (!URL_GS) return Promise.resolve({ data:[], total_vendas:0, receita_total:0, _sem_gas: true });
   const url = URL_GS + '?action=comercial';
-  return fetch(url).then(r => r.json()).catch(() => ({ data:[], total_vendas:0, receita_total:0 }));
+  return fetch(url)
+    .then(r => r.text())
+    .then(txt => {
+      try { return JSON.parse(txt); }
+      catch(e) { return { error: 'Apps Script retornou HTML — refaça o deploy', data:[], total_vendas:0, receita_total:0 }; }
+    })
+    .catch(e => ({ error: e.message, data:[], total_vendas:0, receita_total:0 }));
+}
+
+// Chama qualquer action no Apps Script
+function gsCall(action, params) {
+  if (!URL_GS) return Promise.resolve({ error: 'Apps Script não configurado' });
+  const qs = new URLSearchParams(Object.assign({ action }, params || {})).toString();
+  return fetch(URL_GS + '?' + qs)
+    .then(r => r.text())
+    .then(txt => { try { return JSON.parse(txt); } catch(e) { return { error: 'Resposta inválida do Apps Script' }; } })
+    .catch(e => ({ error: e.message }));
 }
 
 // Criativos calculados localmente (sem chamada extra)
@@ -758,17 +781,30 @@ function renderTabela(ads) {
     return;
   }
 
-  const sortKeys = ['cliques','gasto','compras','leads','ctr','cpc','cpa','cpl'];
-  const sortLabels = { cliques:'Cliques',gasto:'Gasto',compras:'Compras',leads:'Leads',ctr:'CTR',cpc:'CPC',cpa:'CPA',cpl:'CPL' };
+  const sortKeys = ['compras','cliques','gasto','leads','ctr','cpc','cpa','cpl','impressoes','alcance'];
+  const sortLabels = {
+    compras:'🛒 Vendas', cliques:'👆 Cliques', gasto:'💰 Gasto', leads:'📋 Leads',
+    ctr:'CTR', cpc:'CPC', cpa:'CPA', cpl:'CPL', impressoes:'Impressões', alcance:'Alcance'
+  };
+  const dirIcon = ST.sortDir === -1 ? ' ↓' : ' ↑';
   const sortBar = sortKeys.map(k =>
-    `<button class="sbtn${ST.sortKey===k?' on':''}" onclick="setSortKey('${k}')">${sortLabels[k]}</button>`
+    `<button class="sbtn${ST.sortKey===k?' on':''}" onclick="setSortKey('${k}')">${sortLabels[k]}${ST.sortKey===k?dirIcon:''}</button>`
   ).join('');
 
   el.innerHTML = `
     <div class="tbl-hd">
-      <div class="tbl-title">Anúncios <span class="tbl-ct">(${sorted.length})</span></div>
+      <div class="tbl-title">Anúncios <span class="tbl-ct">(${sorted.length} de ${ads.length})</span></div>
+      <div style="font-size:11px;color:var(--txt2)">
+        ${document.getElementById('f-since').value} → ${document.getElementById('f-until').value}
+      </div>
     </div>
-    <div class="sort-bar"><span class="sort-lbl">Ordenar:</span>${sortBar}</div>
+    <div class="sort-bar">
+      <span class="sort-lbl">Ordenar por:</span>
+      ${sortBar}
+      <button class="sbtn" onclick="toggleSortDir()" style="margin-left:4px;min-width:80px">
+        ${ST.sortDir===-1 ? '↓ Maior' : '↑ Menor'}
+      </button>
+    </div>
     <div class="tw">${buildTable(sorted)}</div>`;
 
   renderOvTable(sorted);
@@ -863,11 +899,15 @@ function renderComercial() {
   }
   const rows = c.data.slice(0,50);
   const headers = rows.length ? Object.keys(rows[0]).slice(0,8) : [];
+  const gastoMeta = somaAds(filtra()).gasto;
+  const roi = gastoMeta > 0 && c.receita_total > 0 ? ((c.receita_total - gastoMeta)/gastoMeta*100).toFixed(1) : 0;
+  const roas = gastoMeta > 0 && c.receita_total > 0 ? (c.receita_total/gastoMeta).toFixed(2) : 0;
   el.innerHTML = `
-    <div class="com-cards">
-      <div class="card grn"><div class="c-lbl">Total de Compras</div><div class="c-val">${N(c.total_vendas)}</div></div>
+    <div class="com-cards" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:16px">
+      <div class="card grn"><div class="c-lbl">Vendas Comercial</div><div class="c-val">${N(c.total_vendas)}</div><div class="c-sub">na planilha</div></div>
       <div class="card acc"><div class="c-lbl">Receita Total</div><div class="c-val">${R$(c.receita_total)}</div></div>
       <div class="card amb"><div class="c-lbl">Ticket Médio</div><div class="c-val">${c.total_vendas>0?R$(c.receita_total/c.total_vendas):'—'}</div></div>
+      <div class="card ${+roi>=0?'grn':'red'}"><div class="c-lbl">ROI</div><div class="c-val">${roi}%</div><div class="c-sub">ROAS ${roas}×</div></div>
     </div>
     ${rows.length ? `
     <div class="tw"><table>
@@ -955,7 +995,7 @@ async function checaStatus() {
 async function carregaAbas() {
   if (!URL_GS) return;
   try {
-    const r = await gs('getSheets', {});
+    const r = await gsCall('getSheets', {});
     const sel = document.getElementById('cfg-sheets');
     const cur = localStorage.getItem('meta_dash_sheet') || 'Comercial';
     if (r.sheets && r.sheets.length) {
@@ -982,7 +1022,7 @@ async function salvaAba() {
   const nome = document.getElementById('cfg-sheets').value;
   if (!nome) return;
   try {
-    await gs('setSheet', { name: nome });
+    await gsCall('setSheet', { name: nome });
     localStorage.setItem('meta_dash_sheet', nome);
     toast('Aba "' + nome + '" configurada', 'ok');
     checaStatus();
@@ -1027,6 +1067,11 @@ function ordena(ads) {
 
 function setSortKey(k) {
   if (ST.sortKey === k) ST.sortDir *= -1; else { ST.sortKey = k; ST.sortDir = -1; }
+  renderTabela(filtra());
+}
+
+function toggleSortDir() {
+  ST.sortDir *= -1;
   renderTabela(filtra());
 }
 
