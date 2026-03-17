@@ -414,10 +414,11 @@ async function carrega() {
     const comR = await gas('comercial', {});
     const comD = comR || {};
     ST.comercial = {
-      data:       Array.isArray(comD.data) ? comD.data : [],
+      data:       Array.isArray(comD.data)      ? comD.data      : [],
       total:      comD.total      || 0,
       receita:    comD.receita    || 0,
-      por_lote:   Array.isArray(comD.por_lote) ? comD.por_lote : [],
+      por_lote:   Array.isArray(comD.por_lote)  ? comD.por_lote  : [],
+      por_source: Array.isArray(comD.por_source)? comD.por_source: [],
       col_valor:  comD.col_valor  || null,
       col_lote:   comD.col_lote   || null,
       sheet_nome: comD.sheet_nome || 'Compras',
@@ -682,8 +683,8 @@ function renderCom() {
 
   if (c.error && !c.data.length) {
     const abasHtml = c.abas && c.abas.length
-      ? '<div style="margin-top:10px;font-size:12px;color:var(--txt2)">Abas disponíveis: ' +
-        c.abas.map(a=>`<button onclick="salvaAba_nome('${esc(a)}')" style="background:var(--surf2);border:1px solid var(--brd2);color:var(--acc2);padding:2px 8px;border-radius:4px;font-size:11px;cursor:pointer;margin:2px">${esc(a)}</button>`).join('') +
+      ? '<div style="margin-top:10px;font-size:12px;color:var(--txt2)">Selecione a aba correta: ' +
+        c.abas.map(a=>`<button onclick="salvaAba_nome('${esc(a)}')" style="background:var(--surf2);border:1px solid var(--brd2);color:var(--acc2);padding:3px 10px;border-radius:4px;font-size:12px;cursor:pointer;margin:2px">${esc(a)}</button>`).join('') +
         '</div>' : '';
     el.innerHTML = `<div class="empty"><div class="empty-ic">⚠️</div><div style="margin-bottom:6px">${esc(c.error)}</div>${abasHtml}</div>`;
     return;
@@ -695,51 +696,76 @@ function renderCom() {
 
   // Tabela por lote
   const porLote = c.por_lote || [];
-  const loteTable = porLote.length ? `
-    <div style="font-size:12px;font-weight:600;margin:18px 0 10px">Vendas por Lote</div>
-    <div class="tw"><table>
-      <thead><tr><th>Lote</th><th>Vendas</th><th>Receita</th><th>Ticket Médio</th></tr></thead>
-      <tbody>
-        ${porLote.sort((a,b)=>b.receita-a.receita).map(l=>`<tr>
-          <td><span class="lote-b">${esc(l.lote||'Sem Lote')}</span></td>
-          <td><span class="mn">${N(l.total)}</span></td>
-          <td><span class="mn g">${R$(l.receita)}</span></td>
-          <td><span class="mn">${l.total>0?R$(l.receita/l.total):'—'}</span></td>
-        </tr>`).join('')}
-      </tbody>
-    </table></div>` : '';
+  const loteRows = porLote.map(l=>`<tr>
+    <td><span class="lote-b">${esc(l.lote||'Sem Lote')}</span></td>
+    <td class="mn">${N(l.total)}</td>
+    <td class="mn g">${R$(l.receita)}</td>
+    <td class="mn">${l.total>0?R$(l.receita/l.total):'—'}</td>
+    <td class="mn">${gastoMeta>0&&l.receita>0?(l.receita/gastoMeta*100).toFixed(1)+'%':'—'}</td>
+  </tr>`).join('');
+
+  // Tabela por source (UTM)
+  const porSource = c.por_source || [];
+  const srcRows = porSource.slice(0,10).map(s=>`<tr>
+    <td style="font-size:12px">${esc(s.source||'Orgânico')}</td>
+    <td class="mn">${N(s.total)}</td>
+    <td class="mn g">${R$(s.receita)}</td>
+    <td class="mn">${s.total>0?R$(s.receita/s.total):'—'}</td>
+  </tr>`).join('');
 
   // Tabela de vendas
-  const vendas = c.data || [];
-  const vendasTable = vendas.length ? `
-    <div style="font-size:12px;font-weight:600;margin:18px 0 10px">Últimas Vendas <span style="font-weight:400;color:var(--txt2)">(${Math.min(vendas.length,50)} de ${vendas.length})</span></div>
-    <div class="tw"><table>
-      <thead><tr><th>Nome</th><th>E-mail</th><th>Valor</th><th>Qtd</th><th>Lote</th><th>Data</th></tr></thead>
-      <tbody>${vendas.slice(0,50).map(v=>`<tr>
-        <td>${esc(v.nome||'—')}</td>
-        <td style="font-size:11px;color:var(--txt2)">${esc(v.email||'—')}</td>
-        <td><span class="mn g">${R$(v.valor)}</span></td>
-        <td><span class="mn">${v.qtd||1}</span></td>
-        <td>${v.lote?`<span class="lote-b">${esc(v.lote)}</span>`:'—'}</td>
-        <td style="font-size:11px;color:var(--txt2)">${esc(v.data||'')}</td>
-      </tr>`).join('')}</tbody>
-    </table></div>` : '<div class="empty"><div class="empty-ic">📋</div>Nenhuma venda encontrada.</div>';
+  const vendas = (c.data || []).slice(0, 50);
 
   el.innerHTML = `
-    <div style="font-size:11px;color:var(--txt2);margin-bottom:14px">
-      Planilha: <strong>Comercial SDA 2026</strong> · Aba: <strong>${esc(c.sheet_nome||'Compras')}</strong>
-      ${c.col_valor?` · Valor: col. ${esc(c.col_valor)}`:''}
-      ${c.col_lote ?` · Lote: col. ${esc(c.col_lote)}`:''}
+    <div style="font-size:11px;color:var(--txt2);margin-bottom:16px;padding:8px 12px;background:var(--surf);border-radius:var(--rs);border:1px solid var(--brd)">
+      Planilha: <strong style="color:var(--txt)">Comercial SDA 2026</strong>
+      &nbsp;·&nbsp; Aba: <strong style="color:var(--acc2)">${esc(c.sheet_nome||'Compras')}</strong>
+      &nbsp;·&nbsp; Valor: col. <strong>${esc(c.col_valor||'L')}</strong>
+      &nbsp;·&nbsp; Lote: col. <strong>${esc(c.col_lote||'W')}</strong>
     </div>
+
     <div class="com-cards">
       <div class="card grn"><div class="clbl">Total de Vendas</div><div class="cval">${N(c.total)}</div><div class="csub">na planilha</div></div>
       <div class="card acc"><div class="clbl">Receita Total</div><div class="cval">${R$(c.receita)}</div></div>
       <div class="card amb"><div class="clbl">Ticket Médio</div><div class="cval">${c.total>0?R$(c.receita/c.total):'—'}</div></div>
       <div class="card ${parseFloat(roi)>=0?'grn':'red'}"><div class="clbl">ROI</div><div class="cval">${roi}%</div><div class="csub">ROAS ${roas}×</div></div>
+      <div class="card blu"><div class="clbl">Invest. Meta</div><div class="cval">${R$(gastoMeta)}</div><div class="csub">no período</div></div>
     </div>
-    ${loteTable}
-    ${vendasTable}`;
+
+    ${porLote.length?`
+    <div style="font-size:12px;font-weight:600;margin:20px 0 10px">📦 Vendas por Lote</div>
+    <div class="tw"><table>
+      <thead><tr><th>Lote</th><th>Vendas</th><th>Receita</th><th>Ticket Médio</th><th>% da Receita</th></tr></thead>
+      <tbody>${loteRows}</tbody>
+    </table></div>`:''}
+
+    ${porSource.length?`
+    <div style="font-size:12px;font-weight:600;margin:20px 0 10px">📱 Vendas por Origem (UTM Source)</div>
+    <div class="tw"><table>
+      <thead><tr><th>Origem</th><th>Vendas</th><th>Receita</th><th>Ticket Médio</th></tr></thead>
+      <tbody>${srcRows}</tbody>
+    </table></div>`:''}
+
+    <div style="font-size:12px;font-weight:600;margin:20px 0 10px">
+      👥 Últimas Vendas
+      <span style="font-weight:400;font-size:11px;color:var(--txt2)">(${vendas.length} de ${c.total})</span>
+    </div>
+    ${vendas.length?`<div class="tw"><table>
+      <thead><tr><th>Nome</th><th>E-mail</th><th>Valor</th><th>Qtd</th><th>Lote</th><th>Origem</th><th>Criativo</th><th>Data</th></tr></thead>
+      <tbody>${vendas.map(v=>`<tr>
+        <td style="font-weight:500">${esc(v.nome||'—')}</td>
+        <td style="font-size:11px;color:var(--txt2)">${esc(v.email||'—')}</td>
+        <td><span class="mn g">${R$(v.valor)}</span></td>
+        <td class="mn">${v.qtd||1}</td>
+        <td>${v.lote?`<span class="lote-b">${esc(v.lote)}</span>`:'—'}</td>
+        <td style="font-size:11px;color:var(--txt2)">${esc(v.source||'—')}</td>
+        <td style="font-size:10px;color:var(--txt2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(v.criativo||'')}">${esc(trunc(v.criativo||'',30))}</td>
+        <td style="font-size:11px;color:var(--txt2)">${esc(v.data||'')}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`:'<div class="empty"><div class="empty-ic">📋</div>Nenhuma venda encontrada.</div>'}
+  `;
 }
+
 
 // CRIATIVOS — calculados localmente dos ads carregados
 function calcCriativos() {
