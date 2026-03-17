@@ -7,130 +7,134 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-:root{
-  --bg:#09090f;--bg2:#0f0f18;--bg3:#141420;
-  --surf:#1a1a26;--surf2:#20202e;
-  --brd:rgba(255,255,255,.07);--brd2:rgba(255,255,255,.13);
-  --txt:#eeeef8;--txt2:#7878a0;--txt3:#44445a;
-  --acc:#6c6fff;--acc2:#9b9aff;
-  --grn:#1dda8a;--amb:#f5a623;--red:#ff5252;--blu:#38bdf8;--pur:#c084fc;
-  --r:12px;--rs:8px;
+:root {
+  --bg:      #09090f; --bg2: #0f0f18; --bg3: #141420;
+  --surf:    #1a1a26; --surf2: #20202e;
+  --brd:     rgba(255,255,255,0.07); --brd2: rgba(255,255,255,0.13);
+  --txt:     #eeeef8; --txt2: #7878a0; --txt3: #44445a;
+  --acc:     #6c6fff; --acc2: #9b9aff;
+  --grn:     #1dda8a; --amb: #f5a623; --red: #ff5252;
+  --blu:     #38bdf8; --pur: #c084fc;
+  --r:       12px;    --rs: 8px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);font-size:14px;line-height:1.5}
 .app{display:flex;flex-direction:column;min-height:100vh}
 
 /* HEADER */
-header{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;background:var(--bg2);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:100;gap:12px}
-.logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
-.logo-icon{width:26px;height:26px;background:var(--acc);border-radius:7px;display:grid;place-items:center}
-.logo-icon svg{width:14px;height:14px;fill:#fff}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:54px;background:var(--bg2);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-dot{width:26px;height:26px;background:var(--acc);border-radius:7px;display:grid;place-items:center}
+.logo-dot svg{width:14px;height:14px;fill:#fff}
 .logo-name{font-size:14px;font-weight:600;letter-spacing:-.02em}
 .logo-sub{font-size:11px;color:var(--txt2)}
-.hdr-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.live-pill{display:flex;align-items:center;gap:5px;background:rgba(29,218,138,.1);border:1px solid rgba(29,218,138,.25);border-radius:20px;padding:3px 9px;font-size:11px;color:var(--grn);font-weight:500}
+.hd-right{display:flex;align-items:center;gap:10px}
+.live-pill{display:flex;align-items:center;gap:5px;background:rgba(29,218,138,0.1);border:1px solid rgba(29,218,138,0.25);border-radius:20px;padding:3px 9px;font-size:11px;color:var(--grn);font-weight:500}
 .live-dot{width:6px;height:6px;background:var(--grn);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-#upd{font-size:11px;color:var(--txt2)}
-#gas-badge{display:none;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(29,218,138,.1);color:var(--grn);border:1px solid rgba(29,218,138,.25)}
-.btn-cfg{background:transparent;border:1px solid var(--brd2);color:var(--txt2);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
+.upd{font-size:11px;color:var(--txt2)}
+.btn-cfg{background:transparent;border:1px solid var(--brd2);color:var(--txt2);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
 .btn-cfg:hover{color:var(--txt);border-color:var(--acc)}
 
 /* TABS */
-.tabs{display:flex;gap:2px;padding:0 20px;background:var(--bg2);border-bottom:1px solid var(--brd);overflow-x:auto}
-.tab{padding:11px 14px;font-size:13px;font-weight:500;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs{display:flex;gap:2px;padding:0 24px;background:var(--bg2);border-bottom:1px solid var(--brd)}
+.tab{padding:11px 16px;font-size:13px;font-weight:500;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
 .tab:hover{color:var(--txt)}
-.tab.on{color:var(--acc2);border-bottom-color:var(--acc)}
+.tab.active{color:var(--acc2);border-bottom-color:var(--acc)}
 
 /* FILTROS */
-.filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 20px;background:var(--bg2);border-bottom:1px solid var(--brd)}
-.fl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;font-weight:500;white-space:nowrap}
-select,input[type=date]{background:var(--surf);border:1px solid var(--brd2);color:var(--txt);padding:6px 10px;border-radius:var(--rs);font-size:12px;font-family:inherit;outline:none;cursor:pointer}
-select:focus,input[type=date]:focus{border-color:var(--acc)}
-.dr{display:flex;align-items:center;gap:5px}
+.filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 24px;background:var(--bg2);border-bottom:1px solid var(--brd)}
+.fl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+select,input[type=date]{background:var(--surf);border:1px solid var(--brd2);color:var(--txt);padding:6px 10px;border-radius:var(--rs);font-size:12px;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s}
+select:hover,input[type=date]:hover,select:focus,input[type=date]:focus{border-color:var(--acc)}
+.dr{display:flex;align-items:center;gap:6px}
 .ds{font-size:10px;color:var(--txt2)}
-.btn-atualizar{margin-left:auto;display:flex;align-items:center;gap:6px;background:var(--acc);color:#fff;border:none;border-radius:var(--rs);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
-.btn-atualizar:hover{background:var(--acc2)}
-.btn-atualizar svg{width:13px;height:13px;fill:currentColor}
+.btn-ref{margin-left:auto;display:flex;align-items:center;gap:6px;background:var(--acc);color:#fff;border:none;border-radius:var(--rs);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-ref:hover{background:var(--acc2);transform:translateY(-1px)}
+.btn-ref svg{width:13px;height:13px;fill:currentColor}
 .spin{animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* CONTEÚDO */
-.content{flex:1;padding:20px}
-.pane{display:none}.pane.on{display:block}
+/* CONTENT */
+.content{flex:1;padding:22px 24px}
+.pane{display:none}.pane.active{display:block}
 
 /* CARDS */
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-bottom:20px}
-.card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:13px 15px;position:relative;overflow:hidden}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:22px}
+.card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
 .card.grn::before{background:var(--grn)}.card.acc::before{background:var(--acc)}
 .card.amb::before{background:var(--amb)}.card.blu::before{background:var(--blu)}
 .card.pur::before{background:var(--pur)}.card.red::before{background:var(--red)}
-.clbl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-.cval{font-size:20px;font-weight:600;letter-spacing:-.03em;line-height:1;margin-bottom:3px}
-.csub{font-size:11px;color:var(--txt2)}
+.c-lbl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.c-val{font-size:21px;font-weight:600;letter-spacing:-.03em;line-height:1;margin-bottom:3px}
+.c-sub{font-size:11px;color:var(--txt2)}
+.c-sub.ok{color:var(--grn)}.c-sub.warn{color:var(--amb)}
 
 /* CHARTS */
-.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
-.chart-box{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:16px}
-.chart-lbl{font-size:11px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
-.chart-wrap{position:relative;height:180px}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.chart-box{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:18px}
+.chart-lbl{font-size:11px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px}
+.chart-wrap{position:relative;height:190px}
 
 /* TABELA */
-.tbl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.tbl-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .tbl-title{font-size:13px;font-weight:600}
-.tbl-info{font-size:11px;color:var(--txt2)}
+.tbl-ct{font-size:11px;color:var(--txt2)}
+.sort-bar{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.sort-lbl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em}
+.sbtn{padding:4px 10px;border-radius:6px;border:1px solid var(--brd);background:transparent;color:var(--txt2);font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
+.sbtn:hover,.sbtn.on{background:var(--surf2);color:var(--txt);border-color:var(--brd2)}
+.sbtn.on{color:var(--acc2);border-color:var(--acc)}
 .tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--brd)}
 table{width:100%;border-collapse:collapse;min-width:860px}
-thead th{background:var(--bg3);padding:9px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--txt2);white-space:nowrap;border-bottom:1px solid var(--brd);position:sticky;top:0}
-thead th.sort{cursor:pointer;user-select:none}
-thead th.sort:hover{color:var(--txt)}
-thead th.sorted{color:var(--acc2)}
-tbody td{padding:10px 12px;border-bottom:1px solid var(--brd);font-size:12px;vertical-align:middle}
+thead th.sorted{color:var(--acc2)!important}thead th.sortable:hover{color:var(--txt)}thead th{background:var(--bg3);padding:9px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);white-space:nowrap;border-bottom:1px solid var(--brd)}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--brd);vertical-align:middle;font-size:12px}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:var(--surf2)}
-tbody tr:hover .ver-ad{opacity:1}
+tbody tr:hover .ad-link{opacity:1}
 .ad-wrap{display:flex;align-items:center;gap:9px}
 .thumb{width:38px;height:38px;border-radius:6px;object-fit:cover;background:var(--surf2);flex-shrink:0}
 .thumb-ph{width:38px;height:38px;border-radius:6px;background:var(--surf2);display:grid;place-items:center;flex-shrink:0;font-size:16px}
 .ad-nm{font-weight:500;font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ad-camp{font-size:10px;color:var(--txt2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ver-ad{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--acc2);text-decoration:none;opacity:0;transition:opacity .15s;background:rgba(108,111,255,.08);padding:2px 6px;border-radius:3px;margin-top:2px}
-.ver-ad:hover{opacity:1;background:rgba(108,111,255,.18)}
+.ad-link{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--acc2);text-decoration:none;opacity:0;transition:opacity .15s;background:rgba(108,111,255,0.08);padding:1px 6px;border-radius:3px;margin-top:2px}
+.ad-link:hover{opacity:1;background:rgba(108,111,255,0.18)}
 .badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
 .st-ACTIVE{background:rgba(29,218,138,.1);color:var(--grn)}
 .st-PAUSED,.st-CAMPAIGN_PAUSED,.st-ADSET_PAUSED{background:rgba(245,166,35,.1);color:var(--amb)}
-.st-DISAPPROVED{background:rgba(255,82,82,.1);color:var(--red)}
-.lote-b{background:rgba(108,111,255,.1);color:var(--acc2);display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px}
-.c03{background:rgba(56,189,248,.1);color:var(--blu)}
-.c04{background:rgba(192,132,252,.1);color:var(--pur)}
-.mn{font-family:'DM Mono',monospace;font-size:11px}
-.g{color:var(--grn)}.a{color:var(--amb)}.r{color:var(--red)}.m{color:var(--txt2)}
+.st-DISAPPROVED,.st-WITH_ISSUES{background:rgba(255,82,82,.1);color:var(--red)}
+.lote-b{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;background:rgba(108,111,255,0.1);color:var(--acc2)}
+.ct-03{background:rgba(56,189,248,.1);color:var(--blu)}
+.ct-04{background:rgba(192,132,252,.1);color:var(--pur)}
+.mono{font-family:'DM Mono',monospace;font-size:11px}
+.ok{color:var(--grn)}.warn{color:var(--amb)}.bad{color:var(--red)}.muted{color:var(--txt2)}
 .attr-b{display:flex;flex-direction:column;gap:2px}
 .attr-r{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--txt2);font-family:'DM Mono',monospace}
 .attr-l{font-size:9px;background:var(--surf2);padding:1px 4px;border-radius:3px}
 
 /* CRIATIVOS */
-.cri-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.cri-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
 .cri-card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;transition:all .2s;cursor:pointer}
-.cri-card:hover{border-color:var(--brd2);transform:translateY(-2px)}
-.cri-img{position:relative;height:140px;background:var(--bg3)}
+.cri-card:hover{border-color:var(--brd2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.cri-img{position:relative;height:150px;background:var(--bg3)}
 .cri-img img{width:100%;height:100%;object-fit:cover}
 .cri-img-ph{width:100%;height:100%;display:grid;place-items:center;font-size:28px;color:var(--txt2)}
-.sc-b{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.75);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace}
+.sc-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.75);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace}
 .sc-hi{color:var(--grn)}.sc-md{color:var(--amb)}.sc-lo{color:var(--red)}
-.cri-body{padding:12px}
-.cri-nm{font-weight:600;font-size:12px;margin-bottom:8px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cri-body{padding:13px}
+.cri-nome{font-weight:600;font-size:12px;margin-bottom:9px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .cri-met{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
-.cm-v{font-size:13px;font-weight:600;font-family:'DM Mono',monospace}
+.cm-v{font-size:14px;font-weight:600;font-family:'DM Mono',monospace}
 .cm-l{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.04em}
-.cri-ins{border-top:1px solid var(--brd);padding-top:8px}
+.cri-ins{border-top:1px solid var(--brd);padding-top:9px}
 .ci{font-size:11px;color:var(--txt2);margin-bottom:3px;line-height:1.4}
-.cri-links{display:flex;gap:5px;margin-top:8px}
+.cri-links{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
 .cri-lnk{font-size:10px;color:var(--acc2);text-decoration:none;background:rgba(108,111,255,.1);padding:2px 8px;border-radius:4px}
+.cri-lnk:hover{background:rgba(108,111,255,.2)}
 
 /* COMERCIAL */
-.com-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.com-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
 
 /* ESTADOS */
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px}
@@ -139,25 +143,27 @@ tbody tr:hover .ver-ad{opacity:1}
 .empty{text-align:center;padding:60px 20px;color:var(--txt2)}
 .empty-ic{font-size:34px;margin-bottom:8px}
 
-/* MODAL */
-#modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:20px}
-.modal-box{background:var(--surf);border:1px solid var(--brd2);border-radius:16px;padding:26px;width:100%;max-width:480px}
-.modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.modal-title{font-size:16px;font-weight:600}
-.modal-x{background:transparent;border:none;color:var(--txt2);font-size:18px;cursor:pointer}
-#modal-status{margin-bottom:16px;padding:11px;border-radius:8px;background:rgba(0,0,0,.3);border:1px solid var(--brd);font-size:12px;color:var(--txt2);line-height:1.7;min-height:48px}
-.m-lbl{font-size:10px;font-weight:600;color:var(--txt);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
-.m-hint{font-size:11px;color:var(--acc);background:rgba(108,111,255,.08);border-radius:6px;padding:9px;margin-bottom:8px;line-height:1.6}
-.m-inp{width:100%;padding:9px 11px;background:#0d0d18;border:1px solid var(--brd2);color:var(--txt);border-radius:8px;font-size:12px;font-family:monospace;outline:none;margin-bottom:7px}
-.m-inp:focus{border-color:var(--acc)}
-.m-btn{width:100%;padding:9px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
-.m-btn.acc{background:var(--acc);color:#fff}
-.m-btn.ghost{background:transparent;border:1px solid var(--brd);color:var(--txt2);margin-top:6px}
-.m-row{display:flex;gap:7px}
-.m-row select{flex:1}
-.m-row .m-btn{width:auto;padding:9px 14px}
-#m-conn{font-size:11px;color:var(--txt2);margin-top:6px;min-height:16px}
-hr.ms{border:none;border-top:1px solid var(--brd);margin:0 0 16px}
+/* MODAL CONFIG */
+#cfg-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:20px}
+.cfg-box{background:var(--surf);border:1px solid var(--brd2);border-radius:16px;padding:26px;width:100%;max-width:500px}
+.cfg-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.cfg-title{font-size:16px;font-weight:600}
+.cfg-x{background:transparent;border:none;color:var(--txt2);font-size:18px;cursor:pointer}
+.cfg-status{margin-bottom:18px;padding:11px;border-radius:8px;background:rgba(0,0,0,.3);border:1px solid var(--brd);font-size:12px;color:var(--txt2);line-height:1.7}
+.cfg-sec{margin-bottom:18px}
+.cfg-lbl{font-size:10px;font-weight:600;color:var(--txt);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+.cfg-hint{font-size:11px;color:var(--acc);background:rgba(108,111,255,.08);border-radius:6px;padding:9px;margin-bottom:8px;line-height:1.6}
+.cfg-inp{width:100%;padding:9px 11px;background:#0d0d18;border:1px solid var(--brd2);color:var(--txt);border-radius:8px;font-size:12px;font-family:monospace;outline:none;margin-bottom:7px}
+.cfg-inp:focus{border-color:var(--acc)}
+.cfg-btn{width:100%;padding:9px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.cfg-btn.acc{background:var(--acc);color:#fff}.cfg-btn.acc:hover{background:var(--acc2)}
+.cfg-btn.teal{background:var(--grn);color:#0a0a0f}.cfg-btn.teal:hover{opacity:.9}
+.cfg-btn.ghost{background:transparent;border:1px solid var(--brd);color:var(--txt2)}.cfg-btn.ghost:hover{color:var(--txt);border-color:var(--brd2)}
+.cfg-row{display:flex;gap:7px}
+.cfg-row select{flex:1}
+.cfg-row .cfg-btn{width:auto;padding:9px 14px}
+.cfg-diag{display:none;margin-top:10px;padding:11px;background:rgba(0,0,0,.3);border-radius:8px;font-size:11px;font-family:monospace;color:var(--txt2);white-space:pre-wrap;max-height:160px;overflow-y:auto}
+hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
 
 /* TOAST */
 .toast{position:fixed;bottom:18px;right:18px;z-index:9999;background:var(--surf);border:1px solid var(--brd2);border-radius:var(--rs);padding:9px 14px;font-size:13px;transform:translateY(80px);opacity:0;transition:all .3s;box-shadow:0 4px 20px rgba(0,0,0,.5)}
@@ -171,8 +177,8 @@ hr.ms{border:none;border-top:1px solid var(--brd);margin:0 0 16px}
 @media(max-width:768px){
   .charts{grid-template-columns:1fr}
   .cards{grid-template-columns:repeat(2,1fr)}
-  .cri-grid{grid-template-columns:1fr}
   .com-cards{grid-template-columns:1fr 1fr}
+  .cri-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -180,82 +186,79 @@ hr.ms{border:none;border-top:1px solid var(--brd);margin:0 0 16px}
 <div class="app">
 
 <!-- MODAL CONFIG -->
-<div id="modal">
-  <div class="modal-box">
-    <div class="modal-hd">
-      <div class="modal-title">⚙️ Configurações</div>
-      <button class="modal-x" onclick="fechaModal()">✕</button>
+<div id="cfg-modal">
+  <div class="cfg-box">
+    <div class="cfg-hd">
+      <div class="cfg-title">⚙️ Planilha Comercial (opcional)</div>
+      <button class="cfg-x" onclick="fechaConfig()">✕</button>
     </div>
-    <div id="modal-status">Verificando conexão...</div>
+    <div class="cfg-status" id="cfg-status">Verificando…</div>
 
-    <div style="margin-bottom:16px">
-      <div class="m-lbl">URL do Apps Script</div>
-      <div class="m-hint">Apps Script → Implantar → Gerenciar → copie a URL <strong>/exec</strong></div>
-      <input id="m-url" class="m-inp" type="url" placeholder="https://script.google.com/macros/s/.../exec">
-      <button class="m-btn acc" onclick="salvaUrl()">💾 Salvar e Testar</button>
-      <div id="m-conn"></div>
+    <div class="cfg-sec">
+      <div class="cfg-lbl">URL do Apps Script (Planilha Comercial)</div>
+      <div class="cfg-hint" style="border-color:rgba(108,111,255,.3)">
+        <strong>Como obter:</strong> Abra o Apps Script da planilha → Implantar → Gerenciar implantações → copie a URL <code>/exec</code>
+      </div>
+      <input id="cfg-url" class="cfg-inp" type="url" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+      <button class="cfg-btn acc" onclick="salvaUrl()">💾 Salvar e Testar Conexão</button>
+      <div id="cfg-conn-result" style="margin-top:8px;font-size:11px;color:var(--txt2)"></div>
     </div>
 
-    <hr class="ms">
+    <hr class="cfg-sep">
 
-    <div style="margin-bottom:14px">
-      <div class="m-lbl">Aba da Planilha Comercial</div>
-      <div class="m-row">
-        <select id="m-sheets"><option value="">Carregando...</option></select>
-        <button class="m-btn acc" style="width:auto;padding:9px 14px" onclick="salvaAba()">Salvar</button>
+    <div class="cfg-sec">
+      <div class="cfg-lbl">Aba da Planilha Comercial</div>
+      <div class="cfg-row">
+        <select id="cfg-sheets"><option value="">Conecte primeiro…</option></select>
+        <button class="cfg-btn teal" onclick="salvaAba()">Salvar</button>
       </div>
     </div>
 
-    <button class="m-btn ghost" onclick="fechaModal()">Fechar</button>
+    <button class="cfg-btn ghost" onclick="roda_diag()" style="margin-top:4px">🔍 Diagnóstico</button>
+    <div class="cfg-diag" id="cfg-diag"></div>
   </div>
 </div>
 
 <!-- HEADER -->
 <header>
   <div class="logo">
-    <div class="logo-icon"><svg viewBox="0 0 16 16"><path d="M8 1.5a6.5 6.5 0 100 13A6.5 6.5 0 008 1.5zM0 8a8 8 0 1116 0A8 8 0 010 8z"/><path d="M6.5 5.5L11 8l-4.5 2.5v-5z"/></svg></div>
-    <div><div class="logo-name">Meta Ads Dashboard</div><div class="logo-sub">Contas 03 + 04</div></div>
+    <div class="logo-dot"><svg viewBox="0 0 16 16"><path d="M8 1.5a6.5 6.5 0 100 13A6.5 6.5 0 008 1.5zM0 8a8 8 0 1116 0A8 8 0 010 8z"/><path d="M6.5 5.5L11 8l-4.5 2.5v-5z"/></svg></div>
+    <div><div class="logo-name">Meta Ads Dashboard</div><div class="logo-sub" id="logo-sub">Contas 03 + 04 · Realtime</div></div>
   </div>
-  <div class="hdr-right">
+  <div class="hd-right">
     <div class="live-pill"><div class="live-dot"></div>Live</div>
-    <div id="gas-badge">📋 Comercial</div>
-    <div id="upd">Aguardando...</div>
-    <button class="btn-cfg" onclick="abreModal()">⚙️</button>
+    <div class="upd" id="upd-txt">Aguardando…</div>
+    <div id="gas-badge" style="display:none;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(29,218,138,0.1);color:var(--grn);border:1px solid rgba(29,218,138,0.25);">📋 Comercial</div>
+    <button class="btn-cfg" onclick="abreConfig()">⚙️ Config</button>
   </div>
 </header>
 
 <!-- TABS -->
 <div class="tabs">
-  <div class="tab on" data-tab="overview">Visão Geral</div>
+  <div class="tab active" data-tab="overview">Visão Geral</div>
   <div class="tab" data-tab="ads">Anúncios</div>
   <div class="tab" data-tab="comercial">Comercial</div>
-  <div class="tab" data-tab="criativos">Criativos</div>
+  <div class="tab" data-tab="criativos">Análise de Criativos</div>
 </div>
 
 <!-- FILTROS -->
 <div class="filters">
   <span class="fl">Conta</span>
   <select id="f-conta">
-    <option value="all">Todas (03+04)</option>
+    <option value="all">Todas (Geral)</option>
     <option value="Conta 03">Conta 03</option>
     <option value="Conta 04">Conta 04</option>
   </select>
-
   <span class="fl">Lote</span>
   <select id="f-lote">
     <option value="">Todos</option>
-    <option value="Lote 1">Lote 1</option>
-    <option value="Lote 2">Lote 2</option>
-    <option value="Lote 3">Lote 3</option>
+    <option value="Lote1">Lote 1</option>
+    <option value="Lote2">Lote 2</option>
+    <option value="Lote3">Lote 3</option>
     <option value="Sem Lote">Sem Lote</option>
   </select>
-
   <span class="fl">Período</span>
-  <div class="dr">
-    <input type="date" id="f-since">
-    <span class="ds">→</span>
-    <input type="date" id="f-until">
-  </div>
+  <div class="dr"><input type="date" id="f-since"><span class="ds">→</span><input type="date" id="f-until"></div>
   <select id="f-preset">
     <option value="">Personalizado</option>
     <option value="today">Hoje</option>
@@ -265,9 +268,8 @@ hr.ms{border:none;border-top:1px solid var(--brd);margin:0 0 16px}
     <option value="this_month" selected>Este mês</option>
     <option value="last_month">Mês passado</option>
   </select>
-
   <span class="fl">Ordenar</span>
-  <select id="f-sort" onchange="mudaOrdem()">
+  <select id="f-sort" onchange="setSortFromSelect()">
     <option value="compras">🛒 Vendas</option>
     <option value="cliques">👆 Cliques</option>
     <option value="gasto">💰 Gasto</option>
@@ -277,14 +279,15 @@ hr.ms{border:none;border-top:1px solid var(--brd);margin:0 0 16px}
     <option value="cpa">CPA</option>
     <option value="cpl">CPL</option>
     <option value="impressoes">Impressões</option>
+    <option value="receita">Receita</option>
     <option value="roas">ROAS</option>
   </select>
-  <select id="f-dir" onchange="mudaOrdem()">
+  <select id="f-dir" onchange="setSortFromSelect()">
     <option value="-1">↓ Maior → Menor</option>
     <option value="1">↑ Menor → Maior</option>
   </select>
 
-  <button class="btn-atualizar" id="btn-ref" onclick="carrega()">
+  <button class="btn-ref" id="btn-ref" onclick="carrega()">
     <svg id="ic-ref" viewBox="0 0 16 16"><path d="M13.65 2.35A8 8 0 1015 8h-2a6 6 0 11-1.06-3.41l-1.65 1.65A.5.5 0 0011 7h4.5A.5.5 0 0016 6.5V2a.5.5 0 00-.85-.35l-1.5 1.5z"/></svg>
     Atualizar
   </button>
@@ -293,25 +296,25 @@ hr.ms{border:none;border-top:1px solid var(--brd);margin:0 0 16px}
 <!-- CONTEÚDO -->
 <div class="content">
 
-  <div class="pane on" id="pane-overview">
+  <div class="pane active" id="pane-overview">
     <div class="cards" id="sum-cards"><div class="loading"><div class="spinner"></div></div></div>
     <div class="charts" id="charts-row" style="display:none">
-      <div class="chart-box"><div class="chart-lbl">Gasto × Compras por Conta</div><div class="chart-wrap"><canvas id="ch1"></canvas></div></div>
-      <div class="chart-box"><div class="chart-lbl">Top 8 por Cliques</div><div class="chart-wrap"><canvas id="ch2"></canvas></div></div>
+      <div class="chart-box"><div class="chart-lbl">Gasto × Compras por Conta</div><div class="chart-wrap"><canvas id="ch-contas"></canvas></div></div>
+      <div class="chart-box"><div class="chart-lbl">Top 8 Anúncios por Cliques</div><div class="chart-wrap"><canvas id="ch-top"></canvas></div></div>
     </div>
     <div id="ov-table"></div>
   </div>
 
   <div class="pane" id="pane-ads">
-    <div id="ads-content"><div class="loading"><div class="spinner"></div><div class="lt">Carregando...</div></div></div>
+    <div id="ads-content"><div class="loading"><div class="spinner"></div><div class="lt">Carregando anúncios…</div></div></div>
   </div>
 
   <div class="pane" id="pane-comercial">
-    <div id="com-content"><div class="loading"><div class="spinner"></div><div class="lt">Carregando...</div></div></div>
+    <div id="com-content"><div class="loading"><div class="spinner"></div><div class="lt">Carregando comercial…</div></div></div>
   </div>
 
   <div class="pane" id="pane-criativos">
-    <div id="cri-content"><div class="loading"><div class="spinner"></div><div class="lt">Carregando...</div></div></div>
+    <div id="cri-content"><div class="loading"><div class="spinner"></div><div class="lt">Analisando criativos…</div></div></div>
   </div>
 
 </div>
@@ -322,17 +325,20 @@ hr.ms{border:none;border-top:1px solid var(--brd);margin:0 0 16px}
 // ============================================================
 // CONFIG
 // ============================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyXAioibU0Fpf7P6jLWTbM7xWjbLEcYBuHvyGbBNqWNagvw5cIdNfJiGkF5i4g4CW5Vhg/exec';
-let URL_GS = localStorage.getItem('meta_dash_url') || GAS_URL;
+const META_TOKEN = 'EAARwZCZBgiQ8UBQ4ZBNphlIZBdTmrYRGL3RCYM8kx5LVwPQO6ZBQV65AYJNmVbgpfX1rJlflFGZCZARol1pYindQcOwJqu27IDJgtPBqtP0zwxWsvTyHiTHZAPoC9hZAACVZCpc1lIFoyysZC8nEZBa6DGW3qZCpwlh1JwhBp38XIiWf8tiZB9MZBKeNnG92F1t7WBCky28qJBZCZCbrBrlhAgXq7uQXukzZC8mwBMmUQcob9mq0Wd';
+const META_API  = 'https://graph.facebook.com/v24.0';
+const CONTAS    = { 'Conta 03': 'act_629328937757745', 'Conta 04': 'act_377480853270622' };
 
-// ============================================================
-// ESTADO
-// ============================================================
+// Apps Script URL — planilha Comercial (embutida, pode ser sobrescrita via Config)
+const GAS_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbyXAioibU0Fpf7P6jLWTbM7xWjbLEcYBuHvyGbBNqWNagvw5cIdNfJiGkF5i4g4CW5Vhg/exec';
+let URL_GS = localStorage.getItem('meta_dash_url') || GAS_URL_DEFAULT;
+
+// Estado global
 const ST = {
-  ads:[], resumo:{}, comercial:{}, criativos:[],
-  sortKey:'compras', sortDir:-1, loaded:false, criLoaded:false
+  ads: [], resumo: {}, comercial: {}, criativos: [],
+  sortKey: 'cliques', sortDir: -1, loaded: false
 };
-let ch1=null, ch2=null;
+let chContas = null, chTop = null;
 
 // ============================================================
 // INIT
@@ -341,551 +347,338 @@ document.addEventListener('DOMContentLoaded', () => {
   initDatas();
   initTabs();
   initFiltros();
-  const inp = document.getElementById('m-url');
-  if(inp) inp.value = URL_GS;
+
+  // Preenche input do modal com URL atual
+  const cfgInput = document.getElementById('cfg-url');
+  if (cfgInput) cfgInput.value = URL_GS;
+
+  // Inicia carregamento
   carrega();
-  setInterval(carrega, 5*60*1000);
+  setInterval(carrega, 5 * 60 * 1000);
 });
 
 function initDatas() {
-  const h = new Date(), p = new Date(h.getFullYear(), h.getMonth(), 1);
-  document.getElementById('f-since').value = fmtD(p);
-  document.getElementById('f-until').value = fmtD(h);
+  const hoje  = new Date();
+  const prim  = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  document.getElementById('f-since').value = fmtD(prim);
+  document.getElementById('f-until').value = fmtD(hoje);
 }
 
 function initTabs() {
   document.querySelectorAll('.tab').forEach(t => {
     t.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
-      document.querySelectorAll('.pane').forEach(x => x.classList.remove('on'));
-      t.classList.add('on');
-      document.getElementById('pane-' + t.dataset.tab).classList.add('on');
-      if (t.dataset.tab === 'criativos' && ST.loaded && !ST.criLoaded) calcCriativos();
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.pane').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('pane-' + t.dataset.tab).classList.add('active');
+      // Carrega criativos sob demanda
+      if (t.dataset.tab === 'criativos' && ST.loaded && !ST.criativos_loaded) {
+        carregaCriativos();
+      }
     });
   });
 }
 
 function initFiltros() {
   document.getElementById('f-preset').addEventListener('change', e => {
-    const v=e.target.value; if(!v) return;
-    const h=new Date(); let s=new Date();
-    if(v==='today') s=h;
-    else if(v==='yesterday'){s=new Date(h-864e5); document.getElementById('f-until').value=fmtD(s);}
-    else if(v==='last_7d') s=new Date(h-6*864e5);
-    else if(v==='last_30d') s=new Date(h-29*864e5);
-    else if(v==='this_month') s=new Date(h.getFullYear(),h.getMonth(),1);
-    else if(v==='last_month'){
-      s=new Date(h.getFullYear(),h.getMonth()-1,1);
-      document.getElementById('f-until').value=fmtD(new Date(h.getFullYear(),h.getMonth(),0));
+    const v = e.target.value; if (!v) return;
+    const h = new Date(); let s = new Date();
+    if (v==='today')       s = h;
+    else if (v==='yesterday') { s = new Date(h-864e5); document.getElementById('f-until').value = fmtD(s); }
+    else if (v==='last_7d')   s = new Date(h - 6*864e5);
+    else if (v==='last_30d')  s = new Date(h - 29*864e5);
+    else if (v==='this_month') s = new Date(h.getFullYear(), h.getMonth(), 1);
+    else if (v==='last_month') {
+      s = new Date(h.getFullYear(), h.getMonth()-1, 1);
+      document.getElementById('f-until').value = fmtD(new Date(h.getFullYear(), h.getMonth(), 0));
     }
-    if(v!=='yesterday'&&v!=='last_month') document.getElementById('f-until').value=fmtD(h);
-    document.getElementById('f-since').value=fmtD(s);
+    if (v !== 'yesterday' && v !== 'last_month') document.getElementById('f-until').value = fmtD(h);
+    document.getElementById('f-since').value = fmtD(s);
   });
   ['f-conta','f-lote'].forEach(id => {
-    document.getElementById(id).addEventListener('change', () => { if(ST.loaded) renderTudo(); });
+    document.getElementById(id).addEventListener('change', () => { if (ST.loaded) renderTudo(); });
   });
 }
 
 // ============================================================
-// CARREGAR
+// CARREGAR DADOS
 // ============================================================
 async function carrega() {
   setCarregando(true);
-  document.getElementById('upd').textContent = 'Carregando...';
   try {
     const since   = document.getElementById('f-since').value;
     const until   = document.getElementById('f-until').value;
-    const conta   = document.getElementById('f-conta').value;
+    const account = document.getElementById('f-conta').value;
 
-    // Ads via Apps Script (proxy para Meta API — sem rate limit do browser)
-    document.getElementById('upd').textContent = 'Buscando anúncios...';
-    const adsR = await gas('ads', { since, until, conta });
+    // Ads — chama Meta API diretamente
+    document.getElementById('upd-txt').textContent = 'Carregando ads...';
+    const adsData = await metaGetAds(since, until, account);
+    ST.ads    = adsData.ads    || [];
+    ST.resumo = adsData.resumo || {};
 
-    if (!adsR || adsR.error) {
-      toast('Erro ao buscar ads: ' + (adsR ? adsR.error : 'sem resposta'), 'err');
-    } else {
-      ST.ads    = Array.isArray(adsR.ads)    ? adsR.ads    : [];
-      ST.resumo = adsR.resumo || {};
-      if (adsR.erros && adsR.erros.length) console.warn('Erros parciais:', adsR.erros);
+    // Comercial — chama Apps Script (só para planilha)
+    document.getElementById('upd-txt').textContent = 'Carregando comercial...';
+    const comData = URL_GS ? await gsComercial() : { data:[], total_vendas:0, receita_total:0, _sem_gas: true };
+    const gasBadge = document.getElementById('gas-badge');
+    if (gasBadge) {
+      if (comData._sem_gas) { gasBadge.style.display = 'none'; }
+      else if (comData.error) { gasBadge.style.display = 'flex'; gasBadge.textContent = '⚠️ Comercial'; gasBadge.style.color = 'var(--amb)'; gasBadge.style.background = 'rgba(245,166,35,0.1)'; gasBadge.style.borderColor = 'rgba(245,166,35,0.25)'; }
+      else { gasBadge.style.display = 'flex'; gasBadge.textContent = '📋 ' + (comData.total_vendas||0) + ' vendas'; }
     }
-
-    // Comercial via Apps Script
-    document.getElementById('upd').textContent = 'Carregando comercial...';
-    const comR = await gas('comercial', {});
-    const comD = comR || {};
     ST.comercial = {
-      data:    Array.isArray(comD.data) ? comD.data : [],
-      total:   comD.total   || 0,
-      receita: comD.receita || 0,
-      col:     comD.col_valor || null,
-      error:   comD.error   || null,
-      abas:    comD.abas    || []
+      data:          Array.isArray(comData.data)   ? comData.data   : [],
+      total_vendas:  comData.total_vendas  || 0,
+      receita_total: comData.receita_total || 0,
+      col_valor:     comData.col_valor     || null,
+      error:         comData.error         || null,
+      abas:          comData.abas          || []
     };
 
-    // Badge comercial
-    const badge = document.getElementById('gas-badge');
-    if (badge) {
-      if (ST.comercial.error) {
-        badge.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(245,166,35,.1);color:var(--amb);border:1px solid rgba(245,166,35,.25)';
-        badge.textContent = '⚠️ Comercial';
-      } else if (ST.comercial.total > 0) {
-        badge.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(29,218,138,.1);color:var(--grn);border:1px solid rgba(29,218,138,.25)';
-        badge.textContent = '📋 ' + ST.comercial.total + ' vendas';
-      } else {
-        badge.style.display = 'none';
-      }
-    }
+    ST.criativos        = [];
+    ST.criativos_loaded = false;
+    ST.loaded           = true;
 
-    ST.loaded    = true;
-    ST.criLoaded = false;
     renderTudo();
-    document.getElementById('upd').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
-    toast(ST.ads.length + ' anúncios carregados', 'ok');
+    document.getElementById('upd-txt').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
+    const n = ST.ads.length;
+    toast(n > 0 ? n + ' anúncios carregados ✓' : 'Sem dados para o período', n > 0 ? 'ok' : '');
   } catch(err) {
     console.error(err);
     toast('Erro: ' + err.message, 'err');
-    document.getElementById('upd').textContent = 'Erro';
   }
   setCarregando(false);
 }
 
-// Chamada ao Apps Script com retry
-async function gas(action, params) {
-  if (!URL_GS) throw new Error('URL do Apps Script não configurada — clique em ⚙️');
-  const qs  = new URLSearchParams(Object.assign({ action }, params)).toString();
-  const url = URL_GS + '?' + qs;
+// ============================================================
+// META API — chamadas diretas (sem CORS na Hostinger)
+// ============================================================
 
-  // Timeout 120s
-  const timeout = new Promise((_,r) => setTimeout(() => r(new Error('Timeout 120s')), 120000));
-  const req = fetch(url, { cache: 'no-cache' })
-    .then(r => r.text())
-    .then(t => {
-      try { return JSON.parse(t); }
-      catch(e) {
-        if (t.includes('<!DOCTYPE') || t.includes('<html'))
-          throw new Error('Apps Script retornou HTML — verifique o deploy (Acesso: Qualquer pessoa)');
-        throw new Error('Resposta inválida: ' + t.substring(0, 80));
+// Fetch genérico para Meta API
+async function metaFetch(endpoint, params) {
+  const p = Object.assign({ access_token: META_TOKEN }, params || {});
+  const qs = Object.keys(p).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(p[k])).join('&');
+  const url = META_API + '/' + endpoint + '?' + qs;
+  const r = await fetch(url);
+  const json = await r.json();
+  if (json.error) throw new Error('Meta API: ' + json.error.message);
+  return json;
+}
+
+// Busca todos os ads das contas selecionadas
+async function metaGetAds(since, until, account) {
+  const contas = account === 'all'
+    ? Object.entries(CONTAS)
+    : Object.entries(CONTAS).filter(([n]) => n === account);
+
+  const todosAds = [];
+
+  for (const [contaNome, contaId] of contas) {
+    // 1. Ads ativos
+    const ads = await paginaMeta(contaId + '/ads', {
+      fields: 'id,name,status,effective_status,campaign_id,adset_id,creative',
+      effective_status: '["ACTIVE","CAMPAIGN_PAUSED"]',
+      limit: '200'
+    }, 500);
+
+    // 2. Insights da conta inteira (uma chamada)
+    const insMap = await buscaInsightsMeta(contaId, since, until);
+
+    // 3. Mapa de campanhas
+    const campMap = await buscaCampMapMeta(contaId);
+
+    // 4. Thumbnails
+    const ids = [...new Set(ads.map(a => a.creative && a.creative.id).filter(Boolean))];
+    const thumbMap = await buscaThumbsMeta(ids);
+
+    for (const ad of ads) {
+      const cid   = (ad.creative && ad.creative.id) || '';
+      const ins   = insMap[ad.id] || {};
+      const camp  = campMap[ad.campaign_id] || { name: 'Desconhecida', lote: 'Sem Lote' };
+      const thumb = (thumbMap[cid] && thumbMap[cid].thumbnail_url) || '';
+      const story = (thumbMap[cid] && thumbMap[cid].effective_object_story_id) || '';
+      todosAds.push(montaLinhaJS(ad, ins, contaNome, contaId, camp, thumb, story, thumbMap[cid] || {}));
+    }
+  }
+
+  return { ads: todosAds, resumo: somaAds(todosAds) };
+}
+
+// Paginação genérica
+async function paginaMeta(endpoint, params, max) {
+  const itens = [];
+  let url = META_API + '/' + endpoint + '?' +
+    Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') +
+    '&access_token=' + encodeURIComponent(META_TOKEN);
+  while (url) {
+    const json = await fetch(url).then(r => r.json());
+    if (json.error) { console.warn('paginaMeta:', json.error.message); break; }
+    (json.data || []).forEach(x => itens.push(x));
+    url = (json.paging && json.paging.next) ? json.paging.next : null;
+    if (itens.length >= (max || 1000)) break;
+  }
+  return itens;
+}
+
+async function buscaInsightsMeta(contaId, since, until) {
+  const map = {};
+  const tr  = JSON.stringify({ since, until });
+  const aw  = JSON.stringify(['1d_click','7d_click','1d_view','7d_view']);
+  let url = META_API + '/' + contaId + '/insights' +
+    '?level=ad' +
+    '&fields=ad_id,spend,impressions,clicks,reach,cpc,cpm,ctr,actions,cost_per_action_type,action_values' +
+    '&time_range=' + encodeURIComponent(tr) +
+    '&action_attribution_windows=' + encodeURIComponent(aw) +
+    '&limit=500' +
+    '&access_token=' + encodeURIComponent(META_TOKEN);
+  while (url) {
+    const json = await fetch(url).then(r => r.json());
+    if (json.error) { console.warn('buscaInsightsMeta:', json.error.message); break; }
+    (json.data || []).forEach(row => { if (row.ad_id) map[row.ad_id] = row; });
+    url = (json.paging && json.paging.next) ? json.paging.next : null;
+  }
+  return map;
+}
+
+async function buscaCampMapMeta(contaId) {
+  const map = {};
+  const json = await fetch(META_API + '/' + contaId + '/campaigns?fields=id,name&limit=200&access_token=' + encodeURIComponent(META_TOKEN)).then(r => r.json());
+  (json.data || []).forEach(c => { map[c.id] = { name: c.name, lote: detectaLote(c.name) }; });
+  return map;
+}
+
+async function buscaThumbsMeta(ids) {
+  const map = {};
+  for (let i = 0; i < ids.length; i += 50) {
+    const chunk = ids.slice(i, i+50);
+    const url = META_API + '?ids=' + encodeURIComponent(chunk.join(',')) +
+      '&fields=id,thumbnail_url,effective_object_story_id,instagram_permalink_url,object_story_spec' +
+      '&access_token=' + encodeURIComponent(META_TOKEN);
+    const json = await fetch(url).then(r => r.json());
+    if (!json.error) Object.values(json).forEach(c => { if (c && c.id) map[c.id] = c; });
+  }
+  return map;
+}
+
+function montaLinhaJS(ad, ins, contaNome, contaId, camp, thumb, storyId, creativeData) {
+  const actions = ins.actions    || [];
+  const avArr   = ins.action_values || [];
+
+  const getA  = t => { const a = actions.find(x => x.action_type === t); return a ? +a.value    : 0; };
+  const getAW = (t,w) => { const a = actions.find(x => x.action_type === t); return a ? +(a[w]||0) : 0; };
+  const getAV = t => { const a = avArr.find(x => x.action_type === t);   return a ? +a.value    : 0; };
+
+  const compras = getA('offsite_conversion.fb_pixel_purchase') || getA('purchase') || getA('onsite_web_purchase');
+  const leads   = getA('lead') || getA('offsite_conversion.fb_pixel_lead') || getA('onsite_conversion.lead_grouped');
+  const recVal  = getAV('offsite_conversion.fb_pixel_purchase') || getAV('purchase');
+  const gasto   = +(ins.spend || 0);
+
+  // Prioridade de URL: instagram permalink > facebook post > ads manager
+  const creativeObj = (typeof creativeData === 'object' && creativeData) ? creativeData : {};
+  let adUrl = creativeObj.instagram_permalink_url || '';
+
+  // Se não tem Instagram permalink, tenta montar do story_id
+  if (!adUrl && storyId) {
+    const p = storyId.split('_');
+    // story_id formato: pageId_postId
+    if (p.length === 2) {
+      // Tenta pegar o instagram permalink do object_story_spec
+      const spec = creativeObj.object_story_spec || {};
+      const igUserId = spec.instagram_user_id || '';
+      if (igUserId) {
+        // Link direto do Instagram post (formato padrão)
+        adUrl = 'https://www.instagram.com/p/' + p[1] + '/';
+      } else {
+        adUrl = 'https://www.facebook.com/' + p[0] + '/posts/' + p[1];
       }
-    });
-  return Promise.race([req, timeout]);
-}
-
-// ============================================================
-// RENDER
-// ============================================================
-function renderTudo() {
-  const f = filtra();
-  try { renderCards(f);  } catch(e) { console.warn('cards:', e); }
-  try { renderCharts(f); } catch(e) { console.warn('charts:', e); }
-  try { renderAds(f);    } catch(e) { console.warn('ads:', e); }
-  try { renderOvAds(f);  } catch(e) { console.warn('ovAds:', e); }
-  try { renderCom();     } catch(e) { console.warn('com:', e); }
-}
-
-function filtra() {
-  const conta = document.getElementById('f-conta').value;
-  const lote  = document.getElementById('f-lote').value;
-  return ST.ads.filter(a => {
-    if (conta !== 'all' && a.conta !== conta) return false;
-    if (lote && a.lote !== lote) return false;
-    return true;
-  });
-}
-
-function ordena(ads) {
-  const k = ST.sortKey, d = ST.sortDir;
-  return [...ads].sort((a,b) => ((b[k]||0)-(a[k]||0))*d);
-}
-
-function mudaOrdem() {
-  ST.sortKey = document.getElementById('f-sort').value;
-  ST.sortDir = parseInt(document.getElementById('f-dir').value);
-  if (ST.loaded) renderAds(filtra());
-}
-
-// CARDS
-function renderCards(ads) {
-  const s   = soma(ads);
-  const rec = ST.comercial.receita || 0;
-  const roi = s.gasto>0&&rec>0 ? ((rec-s.gasto)/s.gasto*100).toFixed(1) : 0;
-  const roas= s.gasto>0&&rec>0 ? (rec/s.gasto).toFixed(2) : 0;
-  const cs  = [
-    {l:'Investimento',   v:R$(s.gasto),      s:'',                           c:'acc'},
-    {l:'Cliques',        v:N(s.cliques),     s:'CTR '+s.ctr.toFixed(2)+'%', c:'blu'},
-    {l:'Impressões',     v:N(s.impressoes),  s:'Alcance '+N(s.alcance),     c:'pur'},
-    {l:'Compras (Meta)', v:N(s.compras),     s:s.compras>0?'CPA '+R$(s.cpa):'—',c:'grn'},
-    {l:'Leads',          v:N(s.leads),       s:s.leads>0?'CPL '+R$(s.cpl):'—',c:'amb'},
-    {l:'CPC',            v:R$(s.cpc),        s:'CPM '+R$(s.cpm),            c:'amb'},
-    {l:'Receita Comercial',v:R$(rec),        s:(ST.comercial.total||0)+' vendas',c:'grn'},
-    {l:'ROI',            v:roi+'%',          s:'ROAS '+roas+'×',            c:parseFloat(roi)>=0?'grn':'red'},
-  ];
-  document.getElementById('sum-cards').innerHTML = cs.map(c =>
-    `<div class="card ${c.c}"><div class="clbl">${c.l}</div><div class="cval">${c.v}</div>${c.s?`<div class="csub">${c.s}</div>`:''}</div>`
-  ).join('');
-}
-
-// CHARTS
-function renderCharts(ads) {
-  document.getElementById('charts-row').style.display = 'grid';
-  const gc='rgba(255,255,255,.05)',tc='#7878a0';
-
-  const byC={};
-  ads.forEach(a => {
-    const k=a.conta||'Outra';
-    if(!byC[k]) byC[k]={gasto:0,compras:0,leads:0};
-    byC[k].gasto+=a.gasto||0; byC[k].compras+=a.compras||0; byC[k].leads+=a.leads||0;
-  });
-  const lC=Object.keys(byC);
-  if(ch1) ch1.destroy();
-  ch1=new Chart(document.getElementById('ch1'),{type:'bar',data:{labels:lC,datasets:[
-    {label:'Gasto',data:lC.map(k=>byC[k].gasto),backgroundColor:'rgba(108,111,255,.7)',borderRadius:5,yAxisID:'y1'},
-    {label:'Compras',data:lC.map(k=>byC[k].compras),backgroundColor:'rgba(29,218,138,.7)',borderRadius:5,yAxisID:'y2'},
-    {label:'Leads',data:lC.map(k=>byC[k].leads),backgroundColor:'rgba(245,166,35,.7)',borderRadius:5,yAxisID:'y2'}
-  ]},options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{labels:{color:tc,font:{size:11}}}},
-    scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},
-      y1:{position:'left',ticks:{color:'#9b9aff',font:{size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:gc}},
-      y2:{position:'right',ticks:{color:'#1dda8a',font:{size:10}},grid:{display:false}}}}});
-
-  const top=[...ads].sort((a,b)=>(b.cliques||0)-(a.cliques||0)).slice(0,8);
-  if(ch2) ch2.destroy();
-  ch2=new Chart(document.getElementById('ch2'),{type:'bar',data:{labels:top.map(a=>trunc(a.nome,22)),datasets:[{
-    label:'Cliques',data:top.map(a=>a.cliques||0),
-    backgroundColor:top.map(a=>a.compras>0?'rgba(29,218,138,.7)':'rgba(56,189,248,.7)'),borderRadius:4
-  }]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false}},
-    scales:{x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}},y:{ticks:{color:'#cccce0',font:{size:10}},grid:{display:false}}}}});
-}
-
-// ADS TABLE (tab Anúncios)
-function renderAds(ads) {
-  const sorted = ordena(ads);
-  const el = document.getElementById('ads-content');
-
-  if (!sorted.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-ic">📭</div>Nenhum anúncio encontrado.</div>';
-    return;
-  }
-
-  const since = document.getElementById('f-since').value;
-  const until = document.getElementById('f-until').value;
-
-  // Colunas com header clicável
-  const cols = [
-    {k:'gasto',    l:'Gasto'},
-    {k:'cliques',  l:'Cliques'},
-    {k:'ctr',      l:'CTR'},
-    {k:'cpc',      l:'CPC'},
-    {k:'compras',  l:'Compras'},
-    {k:'cpa',      l:'CPA'},
-    {k:'leads',    l:'Leads'},
-    {k:'cpl',      l:'CPL'},
-  ];
-  const arrow = d => d===-1?'↓':'↑';
-
-  const thead = `
-    <th>Anúncio</th>
-    <th>Conta</th><th>Lote</th><th>Status</th>
-    ${cols.map(c=>`<th class="sort ${ST.sortKey===c.k?'sorted':''}" onclick="clicaCol('${c.k}')">${c.l}${ST.sortKey===c.k?' '+arrow(ST.sortDir):''}</th>`).join('')}
-    <th>Atribuição</th>`;
-
-  const rows = sorted.map(a => {
-    const cn  = (a.conta||'').replace('Conta ','');
-    const lb  = a.lote&&a.lote!=='Sem Lote'?`<span class="lote-b">${esc(a.lote)}</span>`:`<span class="m">—</span>`;
-    const st  = a.status||'';
-    const at  = (a.a1dc||a.a7dc||a.a1dv||a.a7dv)
-      ? `<div class="attr-b">
-          ${a.a1dc?`<div class="attr-r"><span class="attr-l">1d cli</span>${a.a1dc}</div>`:''}
-          ${a.a7dc?`<div class="attr-r"><span class="attr-l">7d cli</span>${a.a7dc}</div>`:''}
-          ${a.a1dv?`<div class="attr-r"><span class="attr-l">1d view</span>${a.a1dv}</div>`:''}
-          ${a.a7dv?`<div class="attr-r"><span class="attr-l">7d view</span>${a.a7dv}</div>`:''}
-        </div>` : '<span class="m">—</span>';
-
-    return `<tr>
-      <td><div class="ad-wrap">
-        ${a.thumb?`<img class="thumb" src="${esc(a.thumb)}" onerror="this.style.display='none'">`:'<div class="thumb-ph">🎬</div>'}
-        <div>
-          <div class="ad-nm" title="${esc(a.nome)}">${esc(trunc(a.nome,40))}</div>
-          <div class="ad-camp">${esc(trunc(a.campanha||'',38))}</div>
-          <a class="ver-ad" href="${esc(a.url)}" target="_blank">Ver anúncio ↗</a>
-        </div>
-      </div></td>
-      <td><span class="badge c0${esc(cn)}">${esc(a.conta||'—')}</span></td>
-      <td>${lb}</td>
-      <td><span class="badge st-${esc(st)}">${fmtSt(st)}</span></td>
-      <td><span class="mn g">${R$(a.gasto)}</span></td>
-      <td><span class="mn">${N(a.cliques)}</span></td>
-      <td><span class="mn ${a.ctr>=2?'g':a.ctr<1?'a':''}">${(a.ctr||0).toFixed(2)}%</span></td>
-      <td><span class="mn ${a.cpc>0&&a.cpc<3?'g':a.cpc>7?'r':''}">${R$(a.cpc)}</span></td>
-      <td><span class="mn ${a.compras>0?'g':''}">${N(a.compras)}</span></td>
-      <td><span class="mn ${a.cpa>0&&a.cpa<500?'g':a.cpa>1000?'r':''}">${a.cpa>0?R$(a.cpa):'—'}</span></td>
-      <td><span class="mn ${a.leads>0?'g':''}">${N(a.leads)}</span></td>
-      <td><span class="mn ${a.cpl>0&&a.cpl<20?'g':a.cpl>50?'r':''}">${a.cpl>0?R$(a.cpl):'—'}</span></td>
-      <td>${at}</td>
-    </tr>`;
-  }).join('');
-
-  el.innerHTML = `
-    <div class="tbl-header">
-      <div class="tbl-title">Anúncios <span style="font-size:11px;color:var(--txt2);font-weight:400">${sorted.length} de ${ads.length}</span></div>
-      <div class="tbl-info">${since} → ${until}</div>
-    </div>
-    <div class="tw"><table><thead><tr>${thead}</tr></thead><tbody>${rows}</tbody></table></div>`;
-}
-
-function clicaCol(k) {
-  if (ST.sortKey === k) ST.sortDir *= -1;
-  else { ST.sortKey = k; ST.sortDir = -1; }
-  // Sincroniza selects
-  const s = document.getElementById('f-sort');
-  const d = document.getElementById('f-dir');
-  if (s) s.value = ST.sortKey;
-  if (d) d.value = String(ST.sortDir);
-  renderAds(filtra());
-}
-
-// TOP ADS (tab Visão Geral)
-function renderOvAds(ads) {
-  const top = [...ads].sort((a,b)=>(b.compras||0)-(a.compras||0)).slice(0,10);
-  if (!top.length) { document.getElementById('ov-table').innerHTML=''; return; }
-  const rows = top.map(a => `<tr>
-    <td><div class="ad-wrap">
-      ${a.thumb?`<img class="thumb" src="${esc(a.thumb)}" onerror="this.style.display='none'">`:'<div class="thumb-ph">🎬</div>'}
-      <div><div class="ad-nm">${esc(trunc(a.nome,36))}</div>
-      <a class="ver-ad" href="${esc(a.url)}" target="_blank" style="opacity:1">Ver anúncio ↗</a></div>
-    </div></td>
-    <td><span class="badge c0${esc((a.conta||'').replace('Conta ',''))}">${esc(a.conta||'—')}</span></td>
-    <td>${a.lote&&a.lote!=='Sem Lote'?`<span class="lote-b">${a.lote}</span>`:'—'}</td>
-    <td><span class="mn g">${R$(a.gasto)}</span></td>
-    <td><span class="mn">${N(a.cliques)}</span></td>
-    <td><span class="mn ${a.compras>0?'g':''}">${N(a.compras)}</span></td>
-    <td><span class="mn">${a.cpa>0?R$(a.cpa):'—'}</span></td>
-    <td><span class="mn ${a.leads>0?'g':''}">${N(a.leads)}</span></td>
-    <td><span class="mn">${a.cpl>0?R$(a.cpl):'—'}</span></td>
-    <td><span class="mn ${a.roas>2?'g':''}">${a.roas>0?a.roas.toFixed(2)+'×':'—'}</span></td>
-  </tr>`).join('');
-  document.getElementById('ov-table').innerHTML = `
-    <div style="font-size:13px;font-weight:600;margin-bottom:10px">Top por Compras</div>
-    <div class="tw"><table><thead><tr>
-      <th>Anúncio</th><th>Conta</th><th>Lote</th>
-      <th>Gasto</th><th>Cliques</th><th>Compras</th><th>CPA</th><th>Leads</th><th>CPL</th><th>ROAS</th>
-    </tr></thead><tbody>${rows}</tbody></table></div>`;
-}
-
-// COMERCIAL
-function renderCom() {
-  const c  = ST.comercial;
-  const el = document.getElementById('com-content');
-
-  if (c.error && !c.data.length) {
-    const abasHtml = c.abas.length
-      ? '<div style="margin-top:8px;font-size:12px">Abas: ' +
-        c.abas.map(a=>`<button onclick="selecionaAba('${esc(a)}')" style="background:var(--surf2);border:1px solid var(--brd2);color:var(--acc2);padding:2px 8px;border-radius:4px;font-size:11px;cursor:pointer;margin:2px">${esc(a)}</button>`).join('') +
-        '</div>' : '';
-    el.innerHTML = `<div class="empty"><div class="empty-ic">⚠️</div><div>${esc(c.error)}</div>${abasHtml}</div>`;
-    return;
-  }
-
-  const gastoMeta = soma(filtra()).gasto;
-  const roi  = gastoMeta>0&&c.receita>0 ? ((c.receita-gastoMeta)/gastoMeta*100).toFixed(1) : 0;
-  const roas = gastoMeta>0&&c.receita>0 ? (c.receita/gastoMeta).toFixed(2) : 0;
-  const hdrs = c.data.length ? Object.keys(c.data[0]).slice(0,8) : [];
-
-  el.innerHTML = `
-    <div class="com-cards">
-      <div class="card grn"><div class="clbl">Vendas</div><div class="cval">${N(c.total)}</div></div>
-      <div class="card acc"><div class="clbl">Receita</div><div class="cval">${R$(c.receita)}</div></div>
-      <div class="card amb"><div class="clbl">Ticket Médio</div><div class="cval">${c.total>0?R$(c.receita/c.total):'—'}</div></div>
-      <div class="card ${parseFloat(roi)>=0?'grn':'red'}"><div class="clbl">ROI</div><div class="cval">${roi}%</div><div class="csub">ROAS ${roas}×</div></div>
-    </div>
-    ${c.data.length?`<div class="tw"><table>
-      <thead><tr>${hdrs.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead>
-      <tbody>${c.data.slice(0,50).map(r=>`<tr>${hdrs.map(h=>`<td>${esc(String(r[h]||''))}</td>`).join('')}</tr>`).join('')}</tbody>
-    </table></div>`:'<div class="empty"><div class="empty-ic">📋</div>Nenhum dado de compra.</div>'}`;
-}
-
-// CRIATIVOS — calculados localmente dos ads carregados
-function calcCriativos() {
-  const el = document.getElementById('cri-content');
-  el.innerHTML = '<div class="loading"><div class="spinner"></div><div class="lt">Analisando...</div></div>';
-
-  const conta = document.getElementById('f-conta').value;
-  const src   = conta==='all' ? ST.ads : ST.ads.filter(a=>a.conta===conta);
-  const map   = {};
-
-  for (const ad of src) {
-    const k = limpaNome(ad.nome);
-    if (!map[k]) map[k]={nome:k,ads:0,gasto:0,cliques:0,impressoes:0,compras:0,leads:0,alcance:0,receita:0,thumb:'',urls:[]};
-    const c=map[k]; c.ads++;
-    c.gasto+=ad.gasto||0; c.cliques+=ad.cliques||0; c.impressoes+=ad.impressoes||0;
-    c.compras+=ad.compras||0; c.leads+=ad.leads||0; c.alcance+=ad.alcance||0; c.receita+=ad.receita||0;
-    if(!c.thumb&&ad.thumb) c.thumb=ad.thumb;
-    if(ad.url) c.urls.push(ad.url);
-  }
-
-  ST.criativos = Object.values(map).map(c => {
-    c.ctr  = c.impressoes>0 ? +(c.cliques/c.impressoes*100).toFixed(2) : 0;
-    c.cpc  = c.cliques>0    ? +(c.gasto/c.cliques).toFixed(2)          : 0;
-    c.cpl  = c.leads>0      ? +(c.gasto/c.leads).toFixed(2)            : 0;
-    c.cpa  = c.compras>0    ? +(c.gasto/c.compras).toFixed(2)          : 0;
-    c.roas = c.receita>0&&c.gasto>0 ? +(c.receita/c.gasto).toFixed(2) : 0;
-    c.score = calcScore(c);
-    c.insights = calcInsights(c);
-    return c;
-  }).sort((a,b)=>b.cliques-a.cliques);
-
-  ST.criLoaded = true;
-  renderCriativos();
-}
-
-function renderCriativos() {
-  const el = document.getElementById('cri-content');
-  if (!ST.criativos.length) {
-    el.innerHTML='<div class="empty"><div class="empty-ic">🎨</div>Nenhum criativo encontrado.</div>'; return;
-  }
-  el.innerHTML = `
-    <div style="font-size:12px;color:var(--txt2);margin-bottom:14px">${ST.criativos.length} criativos — ordenados por cliques</div>
-    <div class="cri-grid">${ST.criativos.map(c => {
-      const sc=c.score>=70?'hi':c.score>=40?'md':'lo';
-      const links=[...new Set(c.urls)].slice(0,2).map((u,i)=>`<a class="cri-lnk" href="${esc(u)}" target="_blank">Ver${c.urls.length>1?' '+(i+1):''} ↗</a>`).join('');
-      return `<div class="cri-card">
-        <div class="cri-img">
-          ${c.thumb?`<img src="${esc(c.thumb)}" onerror="this.parentElement.innerHTML='<div class=cri-img-ph>🎬</div>'">`:'<div class="cri-img-ph">🎬</div>'}
-          <div class="sc-b sc-${sc}">Score ${c.score}</div>
-        </div>
-        <div class="cri-body">
-          <div class="cri-nm">${esc(c.nome)}</div>
-          <div class="cri-met">
-            <div><div class="cm-v" style="color:var(--blu)">${N(c.cliques)}</div><div class="cm-l">Cliques</div></div>
-            <div><div class="cm-v" style="color:var(--grn)">${N(c.compras)}</div><div class="cm-l">Compras</div></div>
-            <div><div class="cm-v" style="color:var(--amb)">${N(c.leads)}</div><div class="cm-l">Leads</div></div>
-            <div><div class="cm-v">${c.ctr}%</div><div class="cm-l">CTR</div></div>
-            <div><div class="cm-v">${R$(+c.cpc)}</div><div class="cm-l">CPC</div></div>
-            <div><div class="cm-v" style="color:var(--acc2)">${R$(c.gasto)}</div><div class="cm-l">Gasto</div></div>
-          </div>
-          ${c.cpa>0||c.cpl>0?`<div style="display:flex;gap:14px;margin-bottom:8px">
-            ${c.cpa>0?`<div><div class="cm-v" style="font-size:12px">${R$(+c.cpa)}</div><div class="cm-l">CPA</div></div>`:''}
-            ${c.cpl>0?`<div><div class="cm-v" style="font-size:12px">${R$(+c.cpl)}</div><div class="cm-l">CPL</div></div>`:''}
-            ${c.roas>0?`<div><div class="cm-v" style="font-size:12px;color:var(--grn)">${c.roas}×</div><div class="cm-l">ROAS</div></div>`:''}
-          </div>`:''}
-          <div class="cri-ins">${(c.insights||[]).map(i=>`<div class="ci">${i}</div>`).join('')}</div>
-          ${links?`<div class="cri-links">${links}</div>`:''}
-        </div>
-      </div>`;
-    }).join('')}</div>`;
-}
-
-// ============================================================
-// MODAL CONFIG
-// ============================================================
-function abreModal() {
-  const inp = document.getElementById('m-url');
-  if (inp) inp.value = URL_GS;
-  document.getElementById('modal').style.display='flex';
-  checaConexao();
-  carregaAbas();
-}
-function fechaModal() {
-  document.getElementById('modal').style.display='none';
-}
-
-async function checaConexao() {
-  const el = document.getElementById('modal-status');
-  if (!URL_GS) { el.textContent='⚠️ URL não configurada'; return; }
-  el.textContent='⏳ Verificando...';
-  try {
-    const r = await gas('ping', {});
-    if (r && r.ok) {
-      el.innerHTML = '✅ Apps Script conectado!<br>📋 Aba: <strong>' + (localStorage.getItem('meta_dash_sheet')||'Comercial') + '</strong>';
-      el.style.borderColor='rgba(29,218,138,.3)';
-    } else {
-      el.innerHTML = '⚠️ Conectou mas resposta inesperada';
     }
-  } catch(e) {
-    el.innerHTML = '❌ ' + e.message;
-    el.style.borderColor='rgba(255,82,82,.3)';
   }
+  // Fallback: Ads Manager com ID do anúncio
+  if (!adUrl) adUrl = 'https://adsmanager.facebook.com/adsmanager/manage/ads?act='+contaId+'&selected_ad_ids='+ad.id;
+
+  return {
+    id: ad.id, nome: ad.name,
+    status: ad.effective_status || ad.status,
+    conta: contaNome, conta_id: contaId,
+    campanha: camp.name, campanha_id: ad.campaign_id,
+    lote: camp.lote || detectaLote(camp.name),
+    thumb, url: adUrl,
+    gasto, impressoes: +(ins.impressions||0), cliques: +(ins.clicks||0),
+    alcance: +(ins.reach||0), cpc: +(ins.cpc||0), cpm: +(ins.cpm||0), ctr: +(ins.ctr||0),
+    compras, leads,
+    checkouts: getA('omni_initiated_checkout') || getA('initiate_checkout'),
+    receita: recVal,
+    cpl:  leads   > 0 ? gasto/leads   : 0,
+    cpa:  compras > 0 ? gasto/compras : 0,
+    roas: recVal > 0 && gasto > 0 ? recVal/gasto : 0,
+    roi:  recVal > 0 && gasto > 0 ? (recVal-gasto)/gasto*100 : 0,
+    attr_1d_click: getAW('offsite_conversion.fb_pixel_purchase','1d_click') || getAW('purchase','1d_click'),
+    attr_7d_click: getAW('offsite_conversion.fb_pixel_purchase','7d_click') || getAW('purchase','7d_click'),
+    attr_1d_view:  getAW('offsite_conversion.fb_pixel_purchase','1d_view')  || getAW('purchase','1d_view'),
+    attr_7d_view:  getAW('offsite_conversion.fb_pixel_purchase','7d_view')  || getAW('purchase','7d_view')
+  };
 }
 
-async function carregaAbas() {
-  if (!URL_GS) return;
+// Apps Script — APENAS para planilha Comercial
+function gsComercial() {
+  if (!URL_GS) return Promise.resolve({ data:[], total_vendas:0, receita_total:0, _sem_gas: true });
+  const url = URL_GS + '?action=comercial';
+  return fetch(url)
+    .then(r => r.text())
+    .then(txt => {
+      try { return JSON.parse(txt); }
+      catch(e) { return { error: 'Apps Script retornou HTML — refaça o deploy', data:[], total_vendas:0, receita_total:0 }; }
+    })
+    .catch(e => ({ error: e.message, data:[], total_vendas:0, receita_total:0 }));
+}
+
+// Chama qualquer action no Apps Script
+function gsCall(action, params) {
+  if (!URL_GS) return Promise.resolve({ error: 'Apps Script não configurado' });
+  const qs = new URLSearchParams(Object.assign({ action }, params || {})).toString();
+  return fetch(URL_GS + '?' + qs)
+    .then(r => r.text())
+    .then(txt => { try { return JSON.parse(txt); } catch(e) { return { error: 'Resposta inválida do Apps Script' }; } })
+    .catch(e => ({ error: e.message }));
+}
+
+// Criativos calculados localmente (sem chamada extra)
+async function carregaCriativos() {
+  const el = document.getElementById('cri-content');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div><div class="lt">Analisando criativos...</div></div>';
   try {
-    const r   = await gas('getSheets', {});
-    const sel = document.getElementById('m-sheets');
-    const cur = localStorage.getItem('meta_dash_sheet') || 'Comercial';
-    if (r && r.sheets && r.sheets.length) {
-      sel.innerHTML = r.sheets.map(s=>`<option value="${esc(s)}" ${s===cur?'selected':''}>${esc(s)}</option>`).join('');
+    // Agrega os ads já carregados
+    const account = document.getElementById('f-conta').value;
+    const source  = account === 'all' ? ST.ads : ST.ads.filter(a => a.conta === account);
+    const map = {};
+    for (const ad of source) {
+      const key = limpaNome(ad.nome);
+      if (!map[key]) map[key] = { nome:key, ads:0, gasto:0, cliques:0, impressoes:0, compras:0, leads:0, alcance:0, receita:0, thumb:'', urls:[] };
+      const c = map[key];
+      c.ads++; c.gasto+=ad.gasto||0; c.cliques+=ad.cliques||0; c.impressoes+=ad.impressoes||0;
+      c.compras+=ad.compras||0; c.leads+=ad.leads||0; c.alcance+=ad.alcance||0; c.receita+=ad.receita||0;
+      if (!c.thumb && ad.thumb) c.thumb = ad.thumb;
+      if (ad.url) c.urls.push(ad.url);
     }
-  } catch(e) {}
-}
-
-async function salvaUrl() {
-  const url = document.getElementById('m-url').value.trim();
-  if (!url.startsWith('https://script.google.com')) {
-    toast('URL inválida — deve começar com https://script.google.com', 'err'); return;
-  }
-  localStorage.setItem('meta_dash_url', url);
-  URL_GS = url;
-  const conn = document.getElementById('m-conn');
-  if (conn) conn.textContent = '⏳ Testando...';
-  try {
-    const r = await gas('ping', {});
-    if (conn) conn.innerHTML = r && r.ok ? '✅ Conectado!' : '⚠️ Verifique o deploy';
-    toast(r && r.ok ? '✅ Apps Script conectado!' : '⚠️ Conectou mas verifique', r&&r.ok?'ok':'');
+    ST.criativos = Object.values(map).map(c => {
+      c.ctr  = c.impressoes > 0 ? +(c.cliques/c.impressoes*100).toFixed(2) : 0;
+      c.cpc  = c.cliques    > 0 ? +(c.gasto/c.cliques).toFixed(2)          : 0;
+      c.cpl  = c.leads      > 0 ? +(c.gasto/c.leads).toFixed(2)            : 0;
+      c.cpa  = c.compras    > 0 ? +(c.gasto/c.compras).toFixed(2)          : 0;
+      c.roas = c.receita > 0 && c.gasto > 0 ? +(c.receita/c.gasto).toFixed(2) : 0;
+      c.score = calcScore(c); c.insights = calcInsights(c);
+      return c;
+    }).sort((a,b) => b.cliques - a.cliques);
+    ST.criativos_loaded = true;
+    renderCriativos();
   } catch(e) {
-    if (conn) conn.textContent = '❌ ' + e.message;
-    toast('Erro: ' + e.message, 'err');
+    el.innerHTML = '<div class="empty"><div class="empty-ic">⚠️</div>' + e.message + '</div>';
   }
-  carregaAbas();
-  checaConexao();
 }
 
-async function salvaAba() {
-  const nome = document.getElementById('m-sheets').value;
-  if (!nome) return;
-  try {
-    await gas('setSheet', { name: nome });
-    localStorage.setItem('meta_dash_sheet', nome);
-    toast('Aba "' + nome + '" configurada', 'ok');
-    checaConexao();
-    // Recarrega comercial
-    const comR = await gas('comercial', {});
-    const comD = comR || {};
-    ST.comercial = { data:Array.isArray(comD.data)?comD.data:[], total:comD.total||0, receita:comD.receita||0, col:comD.col_valor||null, error:comD.error||null, abas:comD.abas||[] };
-    renderCom();
-    renderCards(filtra());
-  } catch(e) { toast('Erro: '+e.message,'err'); }
-}
-
-async function selecionaAba(nome) {
-  await salvaAba_nome(nome);
-}
-
-async function salvaAba_nome(nome) {
-  try {
-    await gas('setSheet', { name: nome });
-    localStorage.setItem('meta_dash_sheet', nome);
-    toast('Aba "'+nome+'" configurada','ok');
-    const comR = await gas('comercial', {});
-    const comD = comR || {};
-    ST.comercial = { data:Array.isArray(comD.data)?comD.data:[], total:comD.total||0, receita:comD.receita||0, col:comD.col_valor||null, error:comD.error||null, abas:comD.abas||[] };
-    renderCom(); renderCards(filtra());
-  } catch(e) { toast('Erro: '+e.message,'err'); }
-}
-
-// ============================================================
-// HELPERS
-// ============================================================
-function soma(ads) {
-  const s={gasto:0,cliques:0,impressoes:0,compras:0,leads:0,receita:0,alcance:0};
-  ads.forEach(a=>{s.gasto+=a.gasto||0;s.cliques+=a.cliques||0;s.impressoes+=a.impressoes||0;
-    s.compras+=a.compras||0;s.leads+=a.leads||0;s.receita+=a.receita||0;s.alcance+=a.alcance||0;});
-  s.cpc = s.cliques>0    ? s.gasto/s.cliques          : 0;
-  s.cpl = s.leads>0      ? s.gasto/s.leads            : 0;
-  s.cpa = s.compras>0    ? s.gasto/s.compras          : 0;
-  s.ctr = s.impressoes>0 ? s.cliques/s.impressoes*100 : 0;
-  s.cpm = s.impressoes>0 ? s.gasto/s.impressoes*1000  : 0;
-  return s;
+function detectaLote(nome) {
+  if (!nome) return 'Sem Lote';
+  const m = nome.match(/lote[_\-\s]*0*(\d+)/i);
+  return m ? 'Lote ' + m[1] : 'Sem Lote';
 }
 
 function limpaNome(n) {
@@ -895,46 +688,549 @@ function limpaNome(n) {
 }
 
 function calcScore(c) {
-  let s=0;
-  if(c.compras>0) s+=40; if(c.leads>0) s+=20; if(c.ctr>2) s+=20;
-  if(c.cpc>0&&c.cpc<3) s+=10; if(c.cliques>500) s+=10;
-  return Math.min(s,100);
+  let s = 0;
+  if (c.compras > 0)           s += 40;
+  if (c.leads > 0)             s += 20;
+  if (c.ctr > 2)               s += 20;
+  if (c.cpc > 0 && c.cpc < 3) s += 10;
+  if (c.cliques > 500)         s += 10;
+  return Math.min(s, 100);
 }
 
 function calcInsights(c) {
-  const i=[];
-  if(c.ctr>3) i.push('✅ CTR alto — bom hook/thumbnail');
-  else if(c.ctr<1&&c.impressoes>500) i.push('⚠️ CTR baixo — revisar criativo');
-  if(c.cpc>0&&c.cpc<2) i.push('✅ CPC eficiente');
-  else if(c.cpc>6) i.push('⚠️ CPC alto');
-  if(c.compras>5) i.push('✅ '+c.compras+' compras');
-  if(c.leads>100) i.push('✅ '+c.leads+' leads');
-  if(c.roas>2) i.push('✅ ROAS '+c.roas+'×');
-  if(c.gasto>3000&&c.compras===0&&c.leads===0) i.push('🚨 Alto gasto sem conversões');
-  return i.length?i:['📊 Acumule mais dados'];
+  const i = [];
+  if (c.ctr > 3)                          i.push('✅ CTR alto — bom hook/thumbnail');
+  else if (c.ctr < 1 && c.impressoes>500) i.push('⚠️ CTR baixo — revisar criativo');
+  if (c.cpc > 0 && c.cpc < 2)            i.push('✅ CPC eficiente (R$'+c.cpc+')');
+  else if (c.cpc > 6)                     i.push('⚠️ CPC alto');
+  if (c.compras > 5)                      i.push('✅ '+c.compras+' compras');
+  if (c.leads > 100)                      i.push('✅ '+c.leads+' leads');
+  if (c.roas > 2)                         i.push('✅ ROAS '+c.roas+'x');
+  if (c.gasto > 3000 && c.compras===0 && c.leads===0) i.push('🚨 Alto gasto sem conversões');
+  return i.length ? i : ['📊 Acumule mais dados'];
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderTudo() {
+  const filtrados = filtra();
+  try { renderCards(filtrados);    } catch(e) { console.warn(e); }
+  try { renderCharts(filtrados);   } catch(e) { console.warn(e); }
+  try { renderTabela(filtrados);   } catch(e) { console.warn(e); }
+  try { renderComercial();         } catch(e) { console.warn(e); }
+  try { renderCriativos();         } catch(e) { console.warn(e); }
+}
+
+function filtra() {
+  const conta = document.getElementById('f-conta').value;
+  const lote  = document.getElementById('f-lote').value;
+  return ST.ads.filter(a => {
+    if (conta !== 'all' && a.conta !== conta) return false;
+    if (lote  && a.lote  !== lote)            return false;
+    return true;
+  });
+}
+
+// CARDS
+function renderCards(ads) {
+  const s   = somaAds(ads);
+  const com = ST.comercial;
+  const rec = com.receita_total || 0;
+  const roi = s.gasto > 0 && rec > 0 ? ((rec - s.gasto) / s.gasto * 100).toFixed(1) : 0;
+  const roas= s.gasto > 0 && rec > 0 ? (rec / s.gasto).toFixed(2) : 0;
+
+  const def = [
+    { l:'Investimento',     v:R$(s.gasto),         s:'',                              c:'acc' },
+    { l:'Cliques',          v:N(s.cliques),         s:'CTR ' + s.ctr.toFixed(2)+'%',  c:'blu' },
+    { l:'Impressões',       v:N(s.impressoes),      s:'Alcance '+N(s.alcance),         c:'pur' },
+    { l:'Compras (Meta)',   v:N(s.compras),         s:s.compras>0?'CPA '+R$(s.cpa):'—', c:'grn' },
+    { l:'Leads',            v:N(s.leads),           s:s.leads>0?'CPL '+R$(s.cpl):'—', c:'amb' },
+    { l:'CPC',              v:R$(s.cpc),            s:'CPM '+R$(s.cpm),               c:'amb' },
+    { l:'Receita Comercial',v:R$(rec),              s:(com.total_vendas||0)+' vendas', c:'grn' },
+    { l:'ROI',              v:roi+'%',              s:'ROAS '+roas+'×',               c:roi>=0?'grn':'red' },
+  ];
+
+  document.getElementById('sum-cards').innerHTML = def.map(d =>
+    `<div class="card ${d.c}">
+      <div class="c-lbl">${d.l}</div>
+      <div class="c-val">${d.v}</div>
+      ${d.s ? `<div class="c-sub">${d.s}</div>` : ''}
+    </div>`
+  ).join('');
+}
+
+// CHARTS
+function renderCharts(ads) {
+  document.getElementById('charts-row').style.display = 'grid';
+  const dark = true;
+  const gc = 'rgba(255,255,255,0.06)';
+  const tc = '#7878a0';
+
+  // Chart 1 — por conta
+  const byC = {};
+  ads.forEach(a => {
+    const k = a.conta || 'Outra';
+    if (!byC[k]) byC[k] = { gasto:0, compras:0, leads:0 };
+    byC[k].gasto   += a.gasto   || 0;
+    byC[k].compras += a.compras || 0;
+    byC[k].leads   += a.leads   || 0;
+  });
+  const lC = Object.keys(byC);
+  if (chContas) chContas.destroy();
+  chContas = new Chart(document.getElementById('ch-contas'), {
+    type:'bar',
+    data:{ labels:lC, datasets:[
+      { label:'Gasto (R$)',  data:lC.map(k=>byC[k].gasto),   backgroundColor:'rgba(108,111,255,.7)', borderRadius:5, yAxisID:'y1' },
+      { label:'Compras',     data:lC.map(k=>byC[k].compras), backgroundColor:'rgba(29,218,138,.7)',  borderRadius:5, yAxisID:'y2' },
+      { label:'Leads',       data:lC.map(k=>byC[k].leads),   backgroundColor:'rgba(245,166,35,.7)',  borderRadius:5, yAxisID:'y2' },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ color:tc, font:{ size:11 } } } },
+      scales:{
+        x:{ ticks:{color:tc,font:{size:11}}, grid:{color:gc} },
+        y1:{ position:'left',  ticks:{color:'#9b9aff',font:{size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'k'}, grid:{color:gc} },
+        y2:{ position:'right', ticks:{color:'#1dda8a',font:{size:10}}, grid:{display:false} }
+      }
+    }
+  });
+
+  // Chart 2 — top 8 por cliques
+  const top = [...ads].sort((a,b)=>(b.cliques||0)-(a.cliques||0)).slice(0,8);
+  if (chTop) chTop.destroy();
+  chTop = new Chart(document.getElementById('ch-top'), {
+    type:'bar',
+    data:{ labels:top.map(a=>trunc(a.nome,22)),
+      datasets:[{ label:'Cliques', data:top.map(a=>a.cliques||0),
+        backgroundColor:top.map(a=>a.compras>0?'rgba(29,218,138,.7)':'rgba(56,189,248,.7)'), borderRadius:4 }]
+    },
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ ticks:{color:tc,font:{size:10}}, grid:{color:gc} },
+        y:{ ticks:{color:'#cccce0',font:{size:10}}, grid:{display:false} }
+      }
+    }
+  });
+}
+
+// TABELA ADS
+function renderTabela(ads) {
+  const sorted = ordena(ads);
+  const el = document.getElementById('ads-content');
+
+  if (!sorted.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-ic">📭</div>Nenhum anúncio encontrado.</div>`;
+    renderOvTable([]);
+    return;
+  }
+
+  const sortKeys = ['compras','cliques','gasto','leads','ctr','cpc','cpa','cpl','impressoes','alcance'];
+  const sortLabels = {
+    compras:'🛒 Vendas', cliques:'👆 Cliques', gasto:'💰 Gasto', leads:'📋 Leads',
+    ctr:'CTR', cpc:'CPC', cpa:'CPA', cpl:'CPL', impressoes:'Impressões', alcance:'Alcance'
+  };
+  const dirIcon = ST.sortDir === -1 ? ' ↓' : ' ↑';
+  const sortBar = sortKeys.map(k =>
+    `<button class="sbtn${ST.sortKey===k?' on':''}" onclick="setSortKey('${k}')">${sortLabels[k]}${ST.sortKey===k?dirIcon:''}</button>`
+  ).join('');
+
+  el.innerHTML = `
+    <div class="tbl-hd">
+      <div class="tbl-title">Anúncios <span class="tbl-ct">(${sorted.length} de ${ads.length})</span></div>
+      <div style="font-size:11px;color:var(--txt2)">
+        ${document.getElementById('f-since').value} → ${document.getElementById('f-until').value}
+      </div>
+    </div>
+    <div class="sort-bar">
+      <span class="sort-lbl">Ordenar por:</span>
+      ${sortBar}
+      <button class="sbtn" onclick="toggleSortDir()" style="margin-left:4px;min-width:80px">
+        ${ST.sortDir===-1 ? '↓ Maior' : '↑ Menor'}
+      </button>
+    </div>
+    <div class="tw">${buildTable(sorted)}</div>`;
+
+  renderOvTable(sorted);
+}
+
+function buildTable(ads) {
+  const rows = ads.map(a => {
+    const acctNum = (a.conta||'').replace('Conta ','');
+    const loteB   = a.lote && a.lote!=='Sem Lote'
+      ? `<span class="lote-b">${a.lote}</span>` : `<span class="muted">—</span>`;
+    const attrH   = (a.attr_1d_click||a.attr_7d_click||a.attr_1d_view||a.attr_7d_view) ?
+      `<div class="attr-b">
+        ${a.attr_1d_click?`<div class="attr-r"><span class="attr-l">1d cli</span>${a.attr_1d_click}</div>`:''}
+        ${a.attr_7d_click?`<div class="attr-r"><span class="attr-l">7d cli</span>${a.attr_7d_click}</div>`:''}
+        ${a.attr_1d_view ?`<div class="attr-r"><span class="attr-l">1d view</span>${a.attr_1d_view}</div>`:''}
+        ${a.attr_7d_view ?`<div class="attr-r"><span class="attr-l">7d view</span>${a.attr_7d_view}</div>`:''}
+      </div>` : `<span class="muted">—</span>`;
+
+    return `<tr>
+      <td><div class="ad-wrap">
+        ${a.thumb
+          ? `<img class="thumb" src="${esc(a.thumb)}" onerror="this.style.display='none'">`
+          : `<div class="thumb-ph">🎬</div>`}
+        <div>
+          <div class="ad-nm" title="${esc(a.nome)}">${esc(trunc(a.nome,38))}</div>
+          <div class="ad-camp" title="${esc(a.campanha)}">${esc(trunc(a.campanha||'',38))}</div>
+          <a class="ad-link" href="${esc(a.url)}" target="_blank">Ver anúncio ↗</a>
+        </div>
+      </div></td>
+      <td><span class="badge ct-0${esc(acctNum)}">${esc(a.conta||'—')}</span></td>
+      <td>${loteB}</td>
+      <td><span class="badge st-${esc(a.status||'')}">${fmtStatus(a.status)}</span></td>
+      <td><span class="mono ok">${R$(a.gasto)}</span></td>
+      <td><span class="mono">${N(a.cliques)}</span></td>
+      <td><span class="mono ${a.ctr>=2?'ok':a.ctr<1?'warn':''}">${(a.ctr||0).toFixed(2)}%</span></td>
+      <td><span class="mono ${a.cpc>0&&a.cpc<3?'ok':a.cpc>7?'bad':''}">${R$(a.cpc)}</span></td>
+      <td><span class="mono ${a.compras>0?'ok':''}">${N(a.compras)}</span></td>
+      <td><span class="mono ${a.cpa>0&&a.cpa<500?'ok':a.cpa>1000?'bad':''}">${a.cpa>0?R$(a.cpa):'—'}</span></td>
+      <td><span class="mono ${a.leads>0?'ok':''}">${N(a.leads)}</span></td>
+      <td><span class="mono ${a.cpl>0&&a.cpl<20?'ok':a.cpl>50?'bad':''}">${a.cpl>0?R$(a.cpl):'—'}</span></td>
+      <td>${attrH}</td>
+    </tr>`;
+  }).join('');
+
+  return `<table><thead><tr>
+    <th>Anúncio</th><th>Conta</th><th>Lote</th><th>Status</th>
+    <th class="sortable ${ST.sortKey==='gasto'?'sorted':''}" onclick="setSortKey('gasto')" style="cursor:pointer;user-select:none">Gasto ${ST.sortKey==='gasto'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='cliques'?'sorted':''}" onclick="setSortKey('cliques')" style="cursor:pointer;user-select:none">Cliques ${ST.sortKey==='cliques'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='ctr'?'sorted':''}" onclick="setSortKey('ctr')" style="cursor:pointer;user-select:none">CTR ${ST.sortKey==='ctr'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='cpc'?'sorted':''}" onclick="setSortKey('cpc')" style="cursor:pointer;user-select:none">CPC ${ST.sortKey==='cpc'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='compras'?'sorted':''}" onclick="setSortKey('compras')" style="cursor:pointer;user-select:none">Compras ${ST.sortKey==='compras'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='cpa'?'sorted':''}" onclick="setSortKey('cpa')" style="cursor:pointer;user-select:none">CPA ${ST.sortKey==='cpa'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='leads'?'sorted':''}" onclick="setSortKey('leads')" style="cursor:pointer;user-select:none">Leads ${ST.sortKey==='leads'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='cpl'?'sorted':''}" onclick="setSortKey('cpl')" style="cursor:pointer;user-select:none">CPL ${ST.sortKey==='cpl'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th>Atribuição</th>
+  </tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderOvTable(ads) {
+  const top = [...ads].sort((a,b)=>(b.compras||0)-(a.compras||0)).slice(0,10);
+  document.getElementById('ov-table').innerHTML = top.length ? `
+    <div class="tbl-title" style="margin-bottom:10px">Top Anúncios por Compras</div>
+    <div class="tw"><table><thead><tr>
+      <th>Anúncio</th><th>Conta</th><th>Lote</th>
+      <th>Gasto</th><th>Cliques</th><th>Compras</th><th>CPA</th><th>Leads</th><th>CPL</th><th>ROAS</th>
+    </tr></thead><tbody>
+    ${top.map(a => `<tr>
+      <td><div class="ad-wrap">
+        ${a.thumb?`<img class="thumb" src="${esc(a.thumb)}" onerror="this.style.display='none'">`:`<div class="thumb-ph">🎬</div>`}
+        <div>
+          <div class="ad-nm">${esc(trunc(a.nome,35))}</div>
+          <a class="ad-link" href="${esc(a.url)}" target="_blank" style="opacity:1">Ver anúncio ↗</a>
+        </div>
+      </div></td>
+      <td><span class="badge ct-0${esc((a.conta||'').replace('Conta ',''))}">${esc(a.conta||'—')}</span></td>
+      <td>${a.lote&&a.lote!=='Sem Lote'?`<span class="lote-b">${a.lote}</span>`:'—'}</td>
+      <td><span class="mono ok">${R$(a.gasto)}</span></td>
+      <td><span class="mono">${N(a.cliques)}</span></td>
+      <td><span class="mono ${a.compras>0?'ok':''}">${N(a.compras)}</span></td>
+      <td><span class="mono">${a.cpa>0?R$(a.cpa):'—'}</span></td>
+      <td><span class="mono ${a.leads>0?'ok':''}">${N(a.leads)}</span></td>
+      <td><span class="mono">${a.cpl>0?R$(a.cpl):'—'}</span></td>
+      <td><span class="mono ${a.roas>2?'ok':''}">${a.roas>0?a.roas.toFixed(2)+'×':'—'}</span></td>
+    </tr>`).join('')}
+    </tbody></table></div>` : '';
+}
+
+// COMERCIAL
+function renderComercial() {
+  const c = ST.comercial;
+  const el = document.getElementById('com-content');
+  if (c.error && !c.data.length) {
+    const abasHtml = c.abas && c.abas.length
+      ? `<div style="margin-top:10px;font-size:12px;color:var(--txt2)">
+          Abas disponíveis: ${c.abas.map(a => `<button onclick="salvaAbaRapido('${esc(a)}')" style="background:var(--surf2);border:1px solid var(--brd2);color:var(--acc2);padding:2px 8px;border-radius:4px;font-size:11px;cursor:pointer;margin:2px;">${esc(a)}</button>`).join('')}
+        </div>` : '';
+    el.innerHTML = `<div class="empty"><div class="empty-ic">⚠️</div>
+      <div>${esc(c.error)}</div>
+      ${abasHtml}
+      <div style="margin-top:10px"><button onclick="abreConfig()" style="background:var(--acc);color:#fff;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:12px">⚙️ Configurar Aba</button></div>
+    </div>`;
+    return;
+  }
+  const rows = c.data.slice(0,50);
+  const headers = rows.length ? Object.keys(rows[0]).slice(0,8) : [];
+  const gastoMeta = somaAds(filtra()).gasto;
+  const roi = gastoMeta > 0 && c.receita_total > 0 ? ((c.receita_total - gastoMeta)/gastoMeta*100).toFixed(1) : 0;
+  const roas = gastoMeta > 0 && c.receita_total > 0 ? (c.receita_total/gastoMeta).toFixed(2) : 0;
+  el.innerHTML = `
+    <div class="com-cards" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:16px">
+      <div class="card grn"><div class="c-lbl">Vendas Comercial</div><div class="c-val">${N(c.total_vendas)}</div><div class="c-sub">na planilha</div></div>
+      <div class="card acc"><div class="c-lbl">Receita Total</div><div class="c-val">${R$(c.receita_total)}</div></div>
+      <div class="card amb"><div class="c-lbl">Ticket Médio</div><div class="c-val">${c.total_vendas>0?R$(c.receita_total/c.total_vendas):'—'}</div></div>
+      <div class="card ${+roi>=0?'grn':'red'}"><div class="c-lbl">ROI</div><div class="c-val">${roi}%</div><div class="c-sub">ROAS ${roas}×</div></div>
+    </div>
+    ${rows.length ? `
+    <div class="tw"><table>
+      <thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r=>`<tr>${headers.map(h=>`<td>${esc(String(r[h]||''))}</td>`).join('')}</tr>`).join('')}</tbody>
+    </table></div>` : `<div class="empty"><div class="empty-ic">📋</div>Nenhum dado de compra encontrado.</div>`}`;
+}
+
+// CRIATIVOS
+function renderCriativos() {
+  const el = document.getElementById('cri-content');
+  if (!ST.criativos.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-ic">🎨</div>Nenhum criativo encontrado.</div>`; return;
+  }
+  const top3 = ST.criativos.slice(0,3).map(c=>trunc(c.nome,30)).join(', ');
+  el.innerHTML = `
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;color:var(--txt2);margin-bottom:4px">🏆 Top por cliques: <strong>${esc(top3)}</strong></div>
+      <div style="font-size:11px;color:var(--txt2)">${ST.criativos.length} criativos analisados</div>
+    </div>
+    <div class="cri-grid">${ST.criativos.map(c => {
+      const sc = c.score>=70?'hi':c.score>=40?'md':'lo';
+      return `<div class="cri-card">
+        <div class="cri-img">
+          ${c.thumb?`<img src="${esc(c.thumb)}" onerror="this.parentElement.innerHTML='<div class=cri-img-ph>🎬</div>'">`:`<div class="cri-img-ph">🎬</div>`}
+          <div class="sc-badge sc-${sc}">Score ${c.score}</div>
+        </div>
+        <div class="cri-body">
+          <div class="cri-nome">${esc(c.nome)}</div>
+          <div class="cri-met">
+            <div><div class="cm-v" style="color:var(--blu)">${N(c.cliques)}</div><div class="cm-l">Cliques</div></div>
+            <div><div class="cm-v" style="color:var(--grn)">${N(c.compras)}</div><div class="cm-l">Compras</div></div>
+            <div><div class="cm-v" style="color:var(--amb)">${N(c.leads)}</div><div class="cm-l">Leads</div></div>
+            <div><div class="cm-v">${c.ctr}%</div><div class="cm-l">CTR</div></div>
+            <div><div class="cm-v">${R$(+c.cpc)}</div><div class="cm-l">CPC</div></div>
+            <div><div class="cm-v" style="color:var(--acc2)">${R$(c.gasto)}</div><div class="cm-l">Gasto</div></div>
+          </div>
+          ${c.cpa>0||c.cpl>0?`<div style="display:flex;gap:14px;margin-bottom:9px">
+            ${c.cpa>0?`<div><div class="cm-v" style="font-size:13px">${R$(+c.cpa)}</div><div class="cm-l">CPA</div></div>`:''}
+            ${c.cpl>0?`<div><div class="cm-v" style="font-size:13px">${R$(+c.cpl)}</div><div class="cm-l">CPL</div></div>`:''}
+            ${c.roas>0?`<div><div class="cm-v" style="font-size:13px;color:var(--grn)">${c.roas}×</div><div class="cm-l">ROAS</div></div>`:''}
+          </div>`:''}
+          <div class="cri-ins">${(c.insights||[]).map(i=>`<div class="ci">${i}</div>`).join('')}</div>
+          ${c.urls&&c.urls.length?`<div class="cri-links">${[...new Set(c.urls)].slice(0,2).map((u,i)=>`<a class="cri-lnk" href="${esc(u)}" target="_blank">Ver anúncio${c.urls.length>1?' '+(i+1):''} ↗</a>`).join('')}</div>`:''}
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+}
+
+// ============================================================
+// CONFIG MODAL
+// ============================================================
+function abreConfig() {
+  const saved = localStorage.getItem('meta_dash_url');
+  if (saved) document.getElementById('cfg-url').value = saved;
+  document.getElementById('cfg-modal').style.display = 'flex';
+  checaStatus();
+  carregaAbas();
+}
+function fechaConfig() {
+  document.getElementById('cfg-modal').style.display = 'none';
+}
+
+async function checaStatus() {
+  const el = document.getElementById('cfg-status');
+  if (!URL_GS) { el.innerHTML = '⚠️ Cole a URL do Apps Script acima'; el.style.borderColor='rgba(245,166,35,.4)'; return; }
+  el.innerHTML = '⏳ Verificando…';
+  try {
+    const s = await gs('status', {});
+    const ok = s.ok;
+    el.innerHTML = `
+      🔗 Apps Script: <span style="color:var(--grn)">Conectado</span><br>
+      ${ok?'✅':'❌'} Meta API (MktConnector): <span style="color:${ok?'var(--grn)':'var(--red)'};font-weight:500">${ok?'OK — '+(s.user||''):(s.error||'erro')}</span><br>
+      📋 Aba comercial: <strong>${s.sheet||'—'}</strong>
+      ${s.sheets&&s.sheets.length?`<br><span style="font-size:10px;color:var(--txt3)">Abas: ${s.sheets.join(', ')}</span>`:''}
+    `;
+    el.style.borderColor = ok ? 'rgba(29,218,138,.3)' : 'rgba(255,82,82,.3)';
+    el.style.background  = ok ? 'rgba(29,218,138,.05)' : 'rgba(255,82,82,.05)';
+  } catch(e) {
+    el.innerHTML = '❌ Não foi possível conectar: ' + e.message;
+    el.style.borderColor = 'rgba(255,82,82,.3)';
+  }
+}
+
+async function carregaAbas() {
+  if (!URL_GS) return;
+  try {
+    const r = await gsCall('getSheets', {});
+    const sel = document.getElementById('cfg-sheets');
+    const cur = localStorage.getItem('meta_dash_sheet') || 'Comercial';
+    if (r.sheets && r.sheets.length) {
+      sel.innerHTML = r.sheets.map(s => `<option value="${esc(s)}" ${s===cur?'selected':''}>${esc(s)}</option>`).join('');
+    }
+  } catch(e) {}
+}
+
+async function salvaUrl() {
+  const url = document.getElementById('cfg-url').value.trim();
+  if (!url.startsWith('https://script.google.com')) {
+    toast('URL inválida — deve começar com https://script.google.com', 'err'); return;
+  }
+  localStorage.setItem('meta_dash_url', url);
+  URL_GS = url;
+
+  const res = document.getElementById('cfg-conn-result');
+  if (res) res.textContent = '⏳ Testando conexão...';
+
+  try {
+    // Testa a conexão chamando ping no Apps Script
+    const r = await fetch(url + '?action=ping').then(x => x.text()).then(t => JSON.parse(t));
+    if (r.ok || r.ts) {
+      if (res) res.innerHTML = '✅ Apps Script conectado!';
+      toast('✅ Conectado ao Apps Script!', 'ok');
+    } else {
+      if (res) res.innerHTML = '⚠️ Conectou mas recebeu resposta inesperada';
+      toast('⚠️ Conectado mas verificar o deploy', '');
+    }
+  } catch(e) {
+    if (res) res.innerHTML = '❌ Erro: ' + e.message + '<br><small>Verifique se o deploy está com acesso "Qualquer pessoa"</small>';
+    toast('Erro na conexão: ' + e.message, 'err');
+  }
+
+  checaStatus();
+  carregaAbas();
+  // Recarrega dados com o comercial
+  if (ST.loaded) {
+    const comData = await gsComercial();
+    const comD = comData || {};
+    ST.comercial = {
+      data: Array.isArray(comD.data) ? comD.data : [],
+      total_vendas: comD.total_vendas || 0,
+      receita_total: comD.receita_total || 0,
+      col_valor: comD.col_valor || null,
+      error: comD.error || null,
+      abas: comD.abas || []
+    };
+    renderComercial();
+    renderCards(filtra());
+    const b = document.getElementById('gas-badge');
+    if (b) { b.style.display='flex'; b.textContent='📋 ' + (comD.total_vendas||0) + ' vendas'; }
+  } else {
+    carrega(); setInterval(carrega, 5*60*1000);
+  }
+}
+
+async function salvaAbaRapido(nome) {
+  if (!nome) return;
+  try {
+    await gsCall('setSheet', { name: nome });
+    localStorage.setItem('meta_dash_sheet', nome);
+    toast('Aba "' + nome + '" configurada', 'ok');
+    // Recarrega comercial
+    const comData = await gsComercial();
+    const comD = comData || {};
+    ST.comercial = {
+      data: Array.isArray(comD.data) ? comD.data : [],
+      total_vendas: comD.total_vendas || 0,
+      receita_total: comD.receita_total || 0,
+      col_valor: comD.col_valor || null,
+      error: comD.error || null,
+      abas: comD.abas || []
+    };
+    renderComercial();
+    renderCards(filtra());
+    const b = document.getElementById('gas-badge');
+    if (b) { b.style.display='flex'; b.textContent='📋 ' + (comD.total_vendas||0) + ' vendas'; }
+  } catch(e) { toast('Erro: ' + e.message, 'err'); }
+}
+
+async function salvaAba() {
+  const nome = document.getElementById('cfg-sheets').value;
+  if (!nome) return;
+  try {
+    await gsCall('setSheet', { name: nome });
+    localStorage.setItem('meta_dash_sheet', nome);
+    toast('Aba "' + nome + '" configurada', 'ok');
+    checaStatus();
+  } catch(e) { toast('Erro: '+e.message, 'err'); }
+}
+
+async function roda_diag() {
+  const el = document.getElementById('cfg-diag');
+  el.style.display = 'block'; el.textContent = 'Rodando…';
+  try {
+    const s = await gs('status', {});
+    el.textContent = JSON.stringify(s, null, 2);
+  } catch(e) { el.textContent = 'Erro: ' + e.message; }
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function somaAds(ads) {
+  const s = { gasto:0,cliques:0,impressoes:0,compras:0,leads:0,receita:0,alcance:0 };
+  ads.forEach(a => {
+    s.gasto      += a.gasto      || 0;
+    s.cliques    += a.cliques    || 0;
+    s.impressoes += a.impressoes || 0;
+    s.compras    += a.compras    || 0;
+    s.leads      += a.leads      || 0;
+    s.receita    += a.receita    || 0;
+    s.alcance    += a.alcance    || 0;
+  });
+  s.cpc = s.cliques    > 0 ? s.gasto / s.cliques    : 0;
+  s.cpl = s.leads      > 0 ? s.gasto / s.leads      : 0;
+  s.cpa = s.compras    > 0 ? s.gasto / s.compras    : 0;
+  s.ctr = s.impressoes > 0 ? s.cliques / s.impressoes * 100 : 0;
+  s.cpm = s.impressoes > 0 ? s.gasto / s.impressoes * 1000  : 0;
+  return s;
+}
+
+function ordena(ads) {
+  const k = ST.sortKey;
+  return [...ads].sort((a,b) => ((b[k]||0) - (a[k]||0)) * ST.sortDir);
+}
+
+function setSortKey(k) {
+  if (ST.sortKey === k) ST.sortDir *= -1; else { ST.sortKey = k; ST.sortDir = -1; }
+  syncSortSelects();
+  renderTabela(filtra());
+}
+
+function toggleSortDir() {
+  ST.sortDir *= -1;
+  const dirSel = document.getElementById('f-dir');
+  if (dirSel) dirSel.value = String(ST.sortDir);
+  renderTabela(filtra());
+}
+
+function setSortFromSelect() {
+  const sortSel = document.getElementById('f-sort');
+  const dirSel  = document.getElementById('f-dir');
+  if (sortSel) ST.sortKey = sortSel.value;
+  if (dirSel)  ST.sortDir = parseInt(dirSel.value);
+  renderTabela(filtra());
+}
+
+// Sync selects when sort key changes via button
+function syncSortSelects() {
+  const s = document.getElementById('f-sort');
+  const d = document.getElementById('f-dir');
+  if (s) s.value = ST.sortKey;
+  if (d) d.value = String(ST.sortDir);
 }
 
 function setCarregando(v) {
-  const ic=document.getElementById('ic-ref');
-  if(v) ic.classList.add('spin'); else ic.classList.remove('spin');
+  const ic = document.getElementById('ic-ref');
+  if (v) ic.classList.add('spin'); else ic.classList.remove('spin');
 }
 
 function R$(v) {
-  if(!v||isNaN(v)) return '—';
-  return 'R$ '+(+v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if (!v || isNaN(v)) return '—';
+  return 'R$ ' + (+v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-function N(v) { return v?(+v).toLocaleString('pt-BR'):'0'; }
+function N(v) { return v ? (+v).toLocaleString('pt-BR') : '0'; }
 function fmtD(d) { return d.toISOString().split('T')[0]; }
-function fmtSt(s) {
-  const m={ACTIVE:'Ativo',PAUSED:'Pausado',CAMPAIGN_PAUSED:'Camp. Pausada',ADSET_PAUSED:'AdSet Pausado',DISAPPROVED:'Reprovado'};
-  return m[s]||s||'—';
-}
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function trunc(s,n) { s=String(s||''); return s.length>n?s.slice(0,n)+'…':s; }
-function toast(msg,tipo) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast '+(tipo||'')+' show';
-  setTimeout(()=>t.classList.remove('show'),3500);
+function fmtStatus(s) {
+  const m = {ACTIVE:'Ativo',PAUSED:'Pausado',CAMPAIGN_PAUSED:'Camp. Pausada',ADSET_PAUSED:'AdSet Pausado',DISAPPROVED:'Reprovado',WITH_ISSUES:'Com erros'};
+  return m[s] || s || '—';
+}
+
+function toast(msg, tipo) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (tipo||'') + ' show';
+  setTimeout(() => t.classList.remove('show'), 3500);
 }
 </script>
 </body>
