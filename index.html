@@ -88,7 +88,7 @@ select:hover,input[type=date]:hover,select:focus,input[type=date]:focus{border-c
 .sbtn.on{color:var(--acc2);border-color:var(--acc)}
 .tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--brd)}
 table{width:100%;border-collapse:collapse;min-width:860px}
-thead th{background:var(--bg3);padding:9px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);white-space:nowrap;border-bottom:1px solid var(--brd)}
+thead th.sorted{color:var(--acc2)!important}thead th.sortable:hover{color:var(--txt)}thead th{background:var(--bg3);padding:9px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2);white-space:nowrap;border-bottom:1px solid var(--brd)}
 tbody td{padding:10px 12px;border-bottom:1px solid var(--brd);vertical-align:middle;font-size:12px}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:var(--surf2)}
@@ -195,10 +195,13 @@ hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
     <div class="cfg-status" id="cfg-status">Verificando…</div>
 
     <div class="cfg-sec">
-      <div class="cfg-lbl">URL do Apps Script (Web App)</div>
-      <div class="cfg-hint">Cole a URL do Apps Script da planilha para cruzar dados comerciais. Se não tiver, o dashboard funciona normalmente com os dados da Meta.</div>
-      <input id="cfg-url" class="cfg-inp" type="url" placeholder="https://script.google.com/macros/s/AKfycbyXAioibU0Fpf7P6jLWTbM7xWjbLEcYBuHvyGbBNqWNagvw5cIdNfJiGkF5i4g4CW5Vhg/exec">
-      <button class="cfg-btn acc" onclick="salvaUrl()">💾 Salvar URL e Conectar</button>
+      <div class="cfg-lbl">URL do Apps Script (Planilha Comercial)</div>
+      <div class="cfg-hint" style="border-color:rgba(108,111,255,.3)">
+        <strong>Como obter:</strong> Abra o Apps Script da planilha → Implantar → Gerenciar implantações → copie a URL <code>/exec</code>
+      </div>
+      <input id="cfg-url" class="cfg-inp" type="url" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+      <button class="cfg-btn acc" onclick="salvaUrl()">💾 Salvar e Testar Conexão</button>
+      <div id="cfg-conn-result" style="margin-top:8px;font-size:11px;color:var(--txt2)"></div>
     </div>
 
     <hr class="cfg-sep">
@@ -220,7 +223,7 @@ hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
 <header>
   <div class="logo">
     <div class="logo-dot"><svg viewBox="0 0 16 16"><path d="M8 1.5a6.5 6.5 0 100 13A6.5 6.5 0 008 1.5zM0 8a8 8 0 1116 0A8 8 0 010 8z"/><path d="M6.5 5.5L11 8l-4.5 2.5v-5z"/></svg></div>
-    <div><div class="logo-name">Meta Ads Dashboard</div><div class="logo-sub">Contas 03 + 04 · Realtime</div></div>
+    <div><div class="logo-name">Meta Ads Dashboard</div><div class="logo-sub" id="logo-sub">Contas 03 + 04 · Realtime</div></div>
   </div>
   <div class="hd-right">
     <div class="live-pill"><div class="live-dot"></div>Live</div>
@@ -265,6 +268,25 @@ hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
     <option value="this_month" selected>Este mês</option>
     <option value="last_month">Mês passado</option>
   </select>
+  <span class="fl">Ordenar</span>
+  <select id="f-sort" onchange="setSortFromSelect()">
+    <option value="compras">🛒 Vendas</option>
+    <option value="cliques">👆 Cliques</option>
+    <option value="gasto">💰 Gasto</option>
+    <option value="leads">📋 Leads</option>
+    <option value="ctr">CTR</option>
+    <option value="cpc">CPC</option>
+    <option value="cpa">CPA</option>
+    <option value="cpl">CPL</option>
+    <option value="impressoes">Impressões</option>
+    <option value="receita">Receita</option>
+    <option value="roas">ROAS</option>
+  </select>
+  <select id="f-dir" onchange="setSortFromSelect()">
+    <option value="-1">↓ Maior → Menor</option>
+    <option value="1">↑ Menor → Maior</option>
+  </select>
+
   <button class="btn-ref" id="btn-ref" onclick="carrega()">
     <svg id="ic-ref" viewBox="0 0 16 16"><path d="M13.65 2.35A8 8 0 1015 8h-2a6 6 0 11-1.06-3.41l-1.65 1.65A.5.5 0 0011 7h4.5A.5.5 0 0016 6.5V2a.5.5 0 00-.85-.35l-1.5 1.5z"/></svg>
     Atualizar
@@ -301,16 +323,15 @@ hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
 
 <script>
 // ============================================================
-// CONFIG — arquitetura Hostinger
-// Meta API chamada diretamente do browser (sem CORS issues)
-// Apps Script usado APENAS para leitura da planilha Comercial
+// CONFIG
 // ============================================================
 const META_TOKEN = 'EAARwZCZBgiQ8UBQ4ZBNphlIZBdTmrYRGL3RCYM8kx5LVwPQO6ZBQV65AYJNmVbgpfX1rJlflFGZCZARol1pYindQcOwJqu27IDJgtPBqtP0zwxWsvTyHiTHZAPoC9hZAACVZCpc1lIFoyysZC8nEZBa6DGW3qZCpwlh1JwhBp38XIiWf8tiZB9MZBKeNnG92F1t7WBCky28qJBZCZCbrBrlhAgXq7uQXukzZC8mwBMmUQcob9mq0Wd';
 const META_API  = 'https://graph.facebook.com/v24.0';
 const CONTAS    = { 'Conta 03': 'act_629328937757745', 'Conta 04': 'act_377480853270622' };
 
-// URL do Apps Script — APENAS para planilha Comercial
-let URL_GS = localStorage.getItem('meta_dash_url') || '';
+// Apps Script URL — planilha Comercial (embutida, pode ser sobrescrita via Config)
+const GAS_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbyXAioibU0Fpf7P6jLWTbM7xWjbLEcYBuHvyGbBNqWNagvw5cIdNfJiGkF5i4g4CW5Vhg/exec';
+let URL_GS = localStorage.getItem('meta_dash_url') || GAS_URL_DEFAULT;
 
 // Estado global
 const ST = {
@@ -327,7 +348,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initFiltros();
 
-  // Arquitetura Hostinger: Meta API direto, sem CORS
+  // Preenche input do modal com URL atual
+  const cfgInput = document.getElementById('cfg-url');
+  if (cfgInput) cfgInput.value = URL_GS;
+
+  // Inicia carregamento
   carrega();
   setInterval(carrega, 5 * 60 * 1000);
 });
@@ -471,7 +496,7 @@ async function metaGetAds(since, until, account) {
       const camp  = campMap[ad.campaign_id] || { name: 'Desconhecida', lote: 'Sem Lote' };
       const thumb = (thumbMap[cid] && thumbMap[cid].thumbnail_url) || '';
       const story = (thumbMap[cid] && thumbMap[cid].effective_object_story_id) || '';
-      todosAds.push(montaLinhaJS(ad, ins, contaNome, contaId, camp, thumb, story));
+      todosAds.push(montaLinhaJS(ad, ins, contaNome, contaId, camp, thumb, story, thumbMap[cid] || {}));
     }
   }
 
@@ -526,7 +551,7 @@ async function buscaThumbsMeta(ids) {
   for (let i = 0; i < ids.length; i += 50) {
     const chunk = ids.slice(i, i+50);
     const url = META_API + '?ids=' + encodeURIComponent(chunk.join(',')) +
-      '&fields=id,thumbnail_url,effective_object_story_id' +
+      '&fields=id,thumbnail_url,effective_object_story_id,instagram_permalink_url,object_story_spec' +
       '&access_token=' + encodeURIComponent(META_TOKEN);
     const json = await fetch(url).then(r => r.json());
     if (!json.error) Object.values(json).forEach(c => { if (c && c.id) map[c.id] = c; });
@@ -534,7 +559,7 @@ async function buscaThumbsMeta(ids) {
   return map;
 }
 
-function montaLinhaJS(ad, ins, contaNome, contaId, camp, thumb, storyId) {
+function montaLinhaJS(ad, ins, contaNome, contaId, camp, thumb, storyId, creativeData) {
   const actions = ins.actions    || [];
   const avArr   = ins.action_values || [];
 
@@ -547,8 +572,27 @@ function montaLinhaJS(ad, ins, contaNome, contaId, camp, thumb, storyId) {
   const recVal  = getAV('offsite_conversion.fb_pixel_purchase') || getAV('purchase');
   const gasto   = +(ins.spend || 0);
 
-  let adUrl = '';
-  if (storyId) { const p = storyId.split('_'); if (p.length===2) adUrl = 'https://www.facebook.com/'+p[0]+'/posts/'+p[1]; }
+  // Prioridade de URL: instagram permalink > facebook post > ads manager
+  const creativeObj = (typeof creativeData === 'object' && creativeData) ? creativeData : {};
+  let adUrl = creativeObj.instagram_permalink_url || '';
+
+  // Se não tem Instagram permalink, tenta montar do story_id
+  if (!adUrl && storyId) {
+    const p = storyId.split('_');
+    // story_id formato: pageId_postId
+    if (p.length === 2) {
+      // Tenta pegar o instagram permalink do object_story_spec
+      const spec = creativeObj.object_story_spec || {};
+      const igUserId = spec.instagram_user_id || '';
+      if (igUserId) {
+        // Link direto do Instagram post (formato padrão)
+        adUrl = 'https://www.instagram.com/p/' + p[1] + '/';
+      } else {
+        adUrl = 'https://www.facebook.com/' + p[0] + '/posts/' + p[1];
+      }
+    }
+  }
+  // Fallback: Ads Manager com ID do anúncio
   if (!adUrl) adUrl = 'https://adsmanager.facebook.com/adsmanager/manage/ads?act='+contaId+'&selected_ad_ids='+ad.id;
 
   return {
@@ -851,8 +895,15 @@ function buildTable(ads) {
 
   return `<table><thead><tr>
     <th>Anúncio</th><th>Conta</th><th>Lote</th><th>Status</th>
-    <th>Gasto</th><th>Cliques</th><th>CTR</th><th>CPC</th>
-    <th>Compras</th><th>CPA</th><th>Leads</th><th>CPL</th><th>Atribuição</th>
+    <th class="sortable ${ST.sortKey==='gasto'?'sorted':''}" onclick="setSortKey('gasto')" style="cursor:pointer;user-select:none">Gasto ${ST.sortKey==='gasto'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='cliques'?'sorted':''}" onclick="setSortKey('cliques')" style="cursor:pointer;user-select:none">Cliques ${ST.sortKey==='cliques'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='ctr'?'sorted':''}" onclick="setSortKey('ctr')" style="cursor:pointer;user-select:none">CTR ${ST.sortKey==='ctr'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='cpc'?'sorted':''}" onclick="setSortKey('cpc')" style="cursor:pointer;user-select:none">CPC ${ST.sortKey==='cpc'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='compras'?'sorted':''}" onclick="setSortKey('compras')" style="cursor:pointer;user-select:none">Compras ${ST.sortKey==='compras'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='cpa'?'sorted':''}" onclick="setSortKey('cpa')" style="cursor:pointer;user-select:none">CPA ${ST.sortKey==='cpa'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='leads'?'sorted':''}" onclick="setSortKey('leads')" style="cursor:pointer;user-select:none">Leads ${ST.sortKey==='leads'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th class="sortable ${ST.sortKey==='cpl'?'sorted':''}" onclick="setSortKey('cpl')" style="cursor:pointer;user-select:none">CPL ${ST.sortKey==='cpl'?(ST.sortDir===-1?'↓':'↑'):''}</th>
+    <th>Atribuição</th>
   </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
@@ -890,10 +941,14 @@ function renderComercial() {
   const c = ST.comercial;
   const el = document.getElementById('com-content');
   if (c.error && !c.data.length) {
+    const abasHtml = c.abas && c.abas.length
+      ? `<div style="margin-top:10px;font-size:12px;color:var(--txt2)">
+          Abas disponíveis: ${c.abas.map(a => `<button onclick="salvaAbaRapido('${esc(a)}')" style="background:var(--surf2);border:1px solid var(--brd2);color:var(--acc2);padding:2px 8px;border-radius:4px;font-size:11px;cursor:pointer;margin:2px;">${esc(a)}</button>`).join('')}
+        </div>` : '';
     el.innerHTML = `<div class="empty"><div class="empty-ic">⚠️</div>
       <div>${esc(c.error)}</div>
-      ${c.abas.length?`<div style="margin-top:8px;font-size:12px;color:var(--txt2)">Abas disponíveis: ${c.abas.join(', ')}</div>`:''}
-      <div style="margin-top:10px;font-size:12px;color:var(--txt2)">Ajuste em ⚙️ Config → Aba Comercial</div>
+      ${abasHtml}
+      <div style="margin-top:10px"><button onclick="abreConfig()" style="background:var(--acc);color:#fff;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:12px">⚙️ Configurar Aba</button></div>
     </div>`;
     return;
   }
@@ -1004,18 +1059,77 @@ async function carregaAbas() {
   } catch(e) {}
 }
 
-function salvaUrl() {
+async function salvaUrl() {
   const url = document.getElementById('cfg-url').value.trim();
   if (!url.startsWith('https://script.google.com')) {
-    toast('URL inválida', 'err'); return;
+    toast('URL inválida — deve começar com https://script.google.com', 'err'); return;
   }
   localStorage.setItem('meta_dash_url', url);
   URL_GS = url;
-  toast('✅ URL salva!', 'ok');
+
+  const res = document.getElementById('cfg-conn-result');
+  if (res) res.textContent = '⏳ Testando conexão...';
+
+  try {
+    // Testa a conexão chamando ping no Apps Script
+    const r = await fetch(url + '?action=ping').then(x => x.text()).then(t => JSON.parse(t));
+    if (r.ok || r.ts) {
+      if (res) res.innerHTML = '✅ Apps Script conectado!';
+      toast('✅ Conectado ao Apps Script!', 'ok');
+    } else {
+      if (res) res.innerHTML = '⚠️ Conectou mas recebeu resposta inesperada';
+      toast('⚠️ Conectado mas verificar o deploy', '');
+    }
+  } catch(e) {
+    if (res) res.innerHTML = '❌ Erro: ' + e.message + '<br><small>Verifique se o deploy está com acesso "Qualquer pessoa"</small>';
+    toast('Erro na conexão: ' + e.message, 'err');
+  }
+
   checaStatus();
   carregaAbas();
-  fechaConfig();
-  if (!ST.loaded) { carrega(); setInterval(carrega, 5*60*1000); }
+  // Recarrega dados com o comercial
+  if (ST.loaded) {
+    const comData = await gsComercial();
+    const comD = comData || {};
+    ST.comercial = {
+      data: Array.isArray(comD.data) ? comD.data : [],
+      total_vendas: comD.total_vendas || 0,
+      receita_total: comD.receita_total || 0,
+      col_valor: comD.col_valor || null,
+      error: comD.error || null,
+      abas: comD.abas || []
+    };
+    renderComercial();
+    renderCards(filtra());
+    const b = document.getElementById('gas-badge');
+    if (b) { b.style.display='flex'; b.textContent='📋 ' + (comD.total_vendas||0) + ' vendas'; }
+  } else {
+    carrega(); setInterval(carrega, 5*60*1000);
+  }
+}
+
+async function salvaAbaRapido(nome) {
+  if (!nome) return;
+  try {
+    await gsCall('setSheet', { name: nome });
+    localStorage.setItem('meta_dash_sheet', nome);
+    toast('Aba "' + nome + '" configurada', 'ok');
+    // Recarrega comercial
+    const comData = await gsComercial();
+    const comD = comData || {};
+    ST.comercial = {
+      data: Array.isArray(comD.data) ? comD.data : [],
+      total_vendas: comD.total_vendas || 0,
+      receita_total: comD.receita_total || 0,
+      col_valor: comD.col_valor || null,
+      error: comD.error || null,
+      abas: comD.abas || []
+    };
+    renderComercial();
+    renderCards(filtra());
+    const b = document.getElementById('gas-badge');
+    if (b) { b.style.display='flex'; b.textContent='📋 ' + (comD.total_vendas||0) + ' vendas'; }
+  } catch(e) { toast('Erro: ' + e.message, 'err'); }
 }
 
 async function salvaAba() {
@@ -1067,12 +1181,31 @@ function ordena(ads) {
 
 function setSortKey(k) {
   if (ST.sortKey === k) ST.sortDir *= -1; else { ST.sortKey = k; ST.sortDir = -1; }
+  syncSortSelects();
   renderTabela(filtra());
 }
 
 function toggleSortDir() {
   ST.sortDir *= -1;
+  const dirSel = document.getElementById('f-dir');
+  if (dirSel) dirSel.value = String(ST.sortDir);
   renderTabela(filtra());
+}
+
+function setSortFromSelect() {
+  const sortSel = document.getElementById('f-sort');
+  const dirSel  = document.getElementById('f-dir');
+  if (sortSel) ST.sortKey = sortSel.value;
+  if (dirSel)  ST.sortDir = parseInt(dirSel.value);
+  renderTabela(filtra());
+}
+
+// Sync selects when sort key changes via button
+function syncSortSelects() {
+  const s = document.getElementById('f-sort');
+  const d = document.getElementById('f-dir');
+  if (s) s.value = ST.sortKey;
+  if (d) d.value = String(ST.sortDir);
 }
 
 function setCarregando(v) {
