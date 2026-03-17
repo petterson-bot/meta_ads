@@ -189,15 +189,15 @@ hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
 <div id="cfg-modal">
   <div class="cfg-box">
     <div class="cfg-hd">
-      <div class="cfg-title">⚙️ Configurações</div>
+      <div class="cfg-title">⚙️ Planilha Comercial (opcional)</div>
       <button class="cfg-x" onclick="fechaConfig()">✕</button>
     </div>
     <div class="cfg-status" id="cfg-status">Verificando…</div>
 
     <div class="cfg-sec">
       <div class="cfg-lbl">URL do Apps Script (Web App)</div>
-      <div class="cfg-hint">Apps Script → Implantar → Gerenciar → copie a URL <strong>/exec</strong></div>
-      <input id="cfg-url" class="cfg-inp" type="url" placeholder="https://script.google.com/macros/s/AKfycbyaiHwBTQH8fGWfZ8WjVIibuUawr2MAW25Dljdkp5r7YXEMsgJ7FuIRUFcb9u_NuX-cOg/exec">
+      <div class="cfg-hint">Cole a URL do Apps Script da planilha para cruzar dados comerciais. Se não tiver, o dashboard funciona normalmente com os dados da Meta.</div>
+      <input id="cfg-url" class="cfg-inp" type="url" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
       <button class="cfg-btn acc" onclick="salvaUrl()">💾 Salvar URL e Conectar</button>
     </div>
 
@@ -300,14 +300,16 @@ hr.cfg-sep{border:none;border-top:1px solid var(--brd);margin:0 0 18px}
 
 <script>
 // ============================================================
-// CONFIG
-// Token está no Code.gs (MktConnector) — aqui só a URL
+// CONFIG — arquitetura Hostinger
+// Meta API chamada diretamente do browser (sem CORS issues)
+// Apps Script usado APENAS para leitura da planilha Comercial
 // ============================================================
-let URL_GS = localStorage.getItem('meta_dash_url') || '';
+const META_TOKEN = 'EAARwZCZBgiQ8UBQ4ZBNphlIZBdTmrYRGL3RCYM8kx5LVwPQO6ZBQV65AYJNmVbgpfX1rJlflFGZCZARol1pYindQcOwJqu27IDJgtPBqtP0zwxWsvTyHiTHZAPoC9hZAACVZCpc1lIFoyysZC8nEZBa6DGW3qZCpwlh1JwhBp38XIiWf8tiZB9MZBKeNnG92F1t7WBCky28qJBZCZCbrBrlhAgXq7uQXukzZC8mwBMmUQcob9mq0Wd';
+const META_API  = 'https://graph.facebook.com/v24.0';
+const CONTAS    = { 'Conta 03': 'act_629328937757745', 'Conta 04': 'act_377480853270622' };
 
-// Detecta se está rodando DE DENTRO do Apps Script (/exec)
-// Nesse caso usa google.script.run (sem CORS) em vez de fetch
-const DENTRO_GAS = (typeof google !== 'undefined' && google.script && google.script.run);
+// URL do Apps Script — APENAS para planilha Comercial
+let URL_GS = localStorage.getItem('meta_dash_url') || '';
 
 // Estado global
 const ST = {
@@ -324,24 +326,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initFiltros();
 
-  // Se estiver sendo servido PELO Apps Script (via /exec), usa a própria URL como base
-  const currentUrl = window.location.href;
-  if (currentUrl.includes('script.google.com') && !URL_GS) {
-    // Remove parâmetros e usa a URL base como endpoint
-    const base = currentUrl.split('?')[0].split('#')[0];
-    URL_GS = base;
-    localStorage.setItem('meta_dash_url', URL_GS);
-    if (document.getElementById('cfg-url')) document.getElementById('cfg-url').value = URL_GS;
-  }
-
-  // Dentro do GAS: carrega direto (sem CORS, sem URL)
-  // Fora do GAS: precisa da URL configurada
-  if (DENTRO_GAS || URL_GS) {
-    carrega();
-    setInterval(carrega, 5 * 60 * 1000);
-  } else {
-    abreConfig();
-  }
+  // Arquitetura Hostinger: Meta API direto, sem CORS
+  carrega();
+  setInterval(carrega, 5 * 60 * 1000);
 });
 
 function initDatas() {
@@ -358,6 +345,10 @@ function initTabs() {
       document.querySelectorAll('.pane').forEach(x => x.classList.remove('active'));
       t.classList.add('active');
       document.getElementById('pane-' + t.dataset.tab).classList.add('active');
+      // Carrega criativos sob demanda
+      if (t.dataset.tab === 'criativos' && ST.loaded && !ST.criativos_loaded) {
+        carregaCriativos();
+      }
     });
   });
 }
@@ -387,34 +378,33 @@ function initFiltros() {
 // CARREGAR DADOS
 // ============================================================
 async function carrega() {
-  if (!DENTRO_GAS && !URL_GS) { toast('Configure a URL do Apps Script — clique em ⚙️ Config','err'); abreConfig(); return; }
   setCarregando(true);
   try {
     const since   = document.getElementById('f-since').value;
     const until   = document.getElementById('f-until').value;
     const account = document.getElementById('f-conta').value;
 
-    const [adsR, comR, criR] = await Promise.all([
-      gs('ads',       { since, until, account }),
-      gs('comercial', {}),
-      gs('criativos', { since, until, account })
-    ]);
+    // Ads — chama Meta API diretamente
+    document.getElementById('upd-txt').textContent = 'Carregando ads...';
+    const adsData = await metaGetAds(since, until, account);
+    ST.ads    = adsData.ads    || [];
+    ST.resumo = adsData.resumo || {};
 
-    if (adsR.error) { toast('Meta API: ' + adsR.error, 'err'); }
-
-    ST.ads       = Array.isArray(adsR.ads)             ? adsR.ads             : [];
-    ST.resumo    = adsR.resumo                         || {};
+    // Comercial — chama Apps Script (só para planilha)
+    document.getElementById('upd-txt').textContent = 'Carregando comercial...';
+    const comData = URL_GS ? await gsComercial() : { data:[], total_vendas:0, receita_total:0 };
     ST.comercial = {
-      data:          Array.isArray(comR.data)   ? comR.data   : [],
-      total_vendas:  comR.total_vendas  || 0,
-      receita_total: comR.receita_total || 0,
-      col_valor:     comR.col_valor     || null,
-      col_status:    comR.col_status    || null,
-      error:         comR.error         || null,
-      abas:          comR.abas          || []
+      data:          Array.isArray(comData.data)   ? comData.data   : [],
+      total_vendas:  comData.total_vendas  || 0,
+      receita_total: comData.receita_total || 0,
+      col_valor:     comData.col_valor     || null,
+      error:         comData.error         || null,
+      abas:          comData.abas          || []
     };
-    ST.criativos = Array.isArray(criR.criativos) ? criR.criativos : [];
-    ST.loaded    = true;
+
+    ST.criativos        = [];
+    ST.criativos_loaded = false;
+    ST.loaded           = true;
 
     renderTudo();
     document.getElementById('upd-txt').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
@@ -427,39 +417,230 @@ async function carrega() {
   setCarregando(false);
 }
 
-function gs(action, params) {
-  // === MODO 1: Dentro do Apps Script — usa google.script.run (sem CORS) ===
-  if (DENTRO_GAS) {
-    return new Promise((resolve, reject) => {
-      google.script.run
-        .withSuccessHandler(resolve)
-        .withFailureHandler(e => reject(new Error(e.message || String(e))))
-        .handleActionFromHtml(action, params);
-    });
+// ============================================================
+// META API — chamadas diretas (sem CORS na Hostinger)
+// ============================================================
+
+// Fetch genérico para Meta API
+async function metaFetch(endpoint, params) {
+  const p = Object.assign({ access_token: META_TOKEN }, params || {});
+  const qs = Object.keys(p).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(p[k])).join('&');
+  const url = META_API + '/' + endpoint + '?' + qs;
+  const r = await fetch(url);
+  const json = await r.json();
+  if (json.error) throw new Error('Meta API: ' + json.error.message);
+  return json;
+}
+
+// Busca todos os ads das contas selecionadas
+async function metaGetAds(since, until, account) {
+  const contas = account === 'all'
+    ? Object.entries(CONTAS)
+    : Object.entries(CONTAS).filter(([n]) => n === account);
+
+  const todosAds = [];
+
+  for (const [contaNome, contaId] of contas) {
+    // 1. Ads ativos
+    const ads = await paginaMeta(contaId + '/ads', {
+      fields: 'id,name,status,effective_status,campaign_id,adset_id,creative',
+      effective_status: '["ACTIVE","CAMPAIGN_PAUSED"]',
+      limit: '200'
+    }, 500);
+
+    // 2. Insights da conta inteira (uma chamada)
+    const insMap = await buscaInsightsMeta(contaId, since, until);
+
+    // 3. Mapa de campanhas
+    const campMap = await buscaCampMapMeta(contaId);
+
+    // 4. Thumbnails
+    const ids = [...new Set(ads.map(a => a.creative && a.creative.id).filter(Boolean))];
+    const thumbMap = await buscaThumbsMeta(ids);
+
+    for (const ad of ads) {
+      const cid   = (ad.creative && ad.creative.id) || '';
+      const ins   = insMap[ad.id] || {};
+      const camp  = campMap[ad.campaign_id] || { name: 'Desconhecida', lote: 'Sem Lote' };
+      const thumb = (thumbMap[cid] && thumbMap[cid].thumbnail_url) || '';
+      const story = (thumbMap[cid] && thumbMap[cid].effective_object_story_id) || '';
+      todosAds.push(montaLinhaJS(ad, ins, contaNome, contaId, camp, thumb, story));
+    }
   }
 
-  // === MODO 2: Externo — fetch com URL configurada ===
-  if (!URL_GS) return Promise.reject(new Error('URL não configurada'));
+  return { ads: todosAds, resumo: somaAds(todosAds) };
+}
 
-  const qs = new URLSearchParams({ action, ...params }).toString();
-  const url = URL_GS + '?' + qs;
+// Paginação genérica
+async function paginaMeta(endpoint, params, max) {
+  const itens = [];
+  let url = META_API + '/' + endpoint + '?' +
+    Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') +
+    '&access_token=' + encodeURIComponent(META_TOKEN);
+  while (url) {
+    const json = await fetch(url).then(r => r.json());
+    if (json.error) { console.warn('paginaMeta:', json.error.message); break; }
+    (json.data || []).forEach(x => itens.push(x));
+    url = (json.paging && json.paging.next) ? json.paging.next : null;
+    if (itens.length >= (max || 1000)) break;
+  }
+  return itens;
+}
 
-  const timeout = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('Timeout 90s — Apps Script demorou demais')), 90000)
-  );
+async function buscaInsightsMeta(contaId, since, until) {
+  const map = {};
+  const tr  = JSON.stringify({ since, until });
+  const aw  = JSON.stringify(['1d_click','7d_click','1d_view','7d_view']);
+  let url = META_API + '/' + contaId + '/insights' +
+    '?level=ad' +
+    '&fields=ad_id,spend,impressions,clicks,reach,cpc,cpm,ctr,actions,cost_per_action_type,action_values' +
+    '&time_range=' + encodeURIComponent(tr) +
+    '&action_attribution_windows=' + encodeURIComponent(aw) +
+    '&limit=500' +
+    '&access_token=' + encodeURIComponent(META_TOKEN);
+  while (url) {
+    const json = await fetch(url).then(r => r.json());
+    if (json.error) { console.warn('buscaInsightsMeta:', json.error.message); break; }
+    (json.data || []).forEach(row => { if (row.ad_id) map[row.ad_id] = row; });
+    url = (json.paging && json.paging.next) ? json.paging.next : null;
+  }
+  return map;
+}
 
-  const req = fetch(url, { method:'GET', redirect:'follow', cache:'no-cache' })
-    .then(r => r.text())
-    .then(text => {
-      try { return JSON.parse(text); }
-      catch(e) {
-        if (text.includes('<!DOCTYPE') || text.includes('<html'))
-          throw new Error('Apps Script retornou HTML. Verifique: Deploy → Acesso "Qualquer pessoa"');
-        throw new Error('Resposta inválida: ' + text.substring(0,120));
-      }
-    });
+async function buscaCampMapMeta(contaId) {
+  const map = {};
+  const json = await fetch(META_API + '/' + contaId + '/campaigns?fields=id,name&limit=200&access_token=' + encodeURIComponent(META_TOKEN)).then(r => r.json());
+  (json.data || []).forEach(c => { map[c.id] = { name: c.name, lote: detectaLote(c.name) }; });
+  return map;
+}
 
-  return Promise.race([req, timeout]);
+async function buscaThumbsMeta(ids) {
+  const map = {};
+  for (let i = 0; i < ids.length; i += 50) {
+    const chunk = ids.slice(i, i+50);
+    const url = META_API + '?ids=' + encodeURIComponent(chunk.join(',')) +
+      '&fields=id,thumbnail_url,effective_object_story_id' +
+      '&access_token=' + encodeURIComponent(META_TOKEN);
+    const json = await fetch(url).then(r => r.json());
+    if (!json.error) Object.values(json).forEach(c => { if (c && c.id) map[c.id] = c; });
+  }
+  return map;
+}
+
+function montaLinhaJS(ad, ins, contaNome, contaId, camp, thumb, storyId) {
+  const actions = ins.actions    || [];
+  const avArr   = ins.action_values || [];
+
+  const getA  = t => { const a = actions.find(x => x.action_type === t); return a ? +a.value    : 0; };
+  const getAW = (t,w) => { const a = actions.find(x => x.action_type === t); return a ? +(a[w]||0) : 0; };
+  const getAV = t => { const a = avArr.find(x => x.action_type === t);   return a ? +a.value    : 0; };
+
+  const compras = getA('offsite_conversion.fb_pixel_purchase') || getA('purchase') || getA('onsite_web_purchase');
+  const leads   = getA('lead') || getA('offsite_conversion.fb_pixel_lead') || getA('onsite_conversion.lead_grouped');
+  const recVal  = getAV('offsite_conversion.fb_pixel_purchase') || getAV('purchase');
+  const gasto   = +(ins.spend || 0);
+
+  let adUrl = '';
+  if (storyId) { const p = storyId.split('_'); if (p.length===2) adUrl = 'https://www.facebook.com/'+p[0]+'/posts/'+p[1]; }
+  if (!adUrl) adUrl = 'https://adsmanager.facebook.com/adsmanager/manage/ads?act='+contaId+'&selected_ad_ids='+ad.id;
+
+  return {
+    id: ad.id, nome: ad.name,
+    status: ad.effective_status || ad.status,
+    conta: contaNome, conta_id: contaId,
+    campanha: camp.name, campanha_id: ad.campaign_id,
+    lote: camp.lote || detectaLote(camp.name),
+    thumb, url: adUrl,
+    gasto, impressoes: +(ins.impressions||0), cliques: +(ins.clicks||0),
+    alcance: +(ins.reach||0), cpc: +(ins.cpc||0), cpm: +(ins.cpm||0), ctr: +(ins.ctr||0),
+    compras, leads,
+    checkouts: getA('omni_initiated_checkout') || getA('initiate_checkout'),
+    receita: recVal,
+    cpl:  leads   > 0 ? gasto/leads   : 0,
+    cpa:  compras > 0 ? gasto/compras : 0,
+    roas: recVal > 0 && gasto > 0 ? recVal/gasto : 0,
+    roi:  recVal > 0 && gasto > 0 ? (recVal-gasto)/gasto*100 : 0,
+    attr_1d_click: getAW('offsite_conversion.fb_pixel_purchase','1d_click') || getAW('purchase','1d_click'),
+    attr_7d_click: getAW('offsite_conversion.fb_pixel_purchase','7d_click') || getAW('purchase','7d_click'),
+    attr_1d_view:  getAW('offsite_conversion.fb_pixel_purchase','1d_view')  || getAW('purchase','1d_view'),
+    attr_7d_view:  getAW('offsite_conversion.fb_pixel_purchase','7d_view')  || getAW('purchase','7d_view')
+  };
+}
+
+// Apps Script — APENAS para planilha Comercial
+function gsComercial() {
+  if (!URL_GS) return Promise.resolve({ data:[], total_vendas:0, receita_total:0 });
+  const url = URL_GS + '?action=comercial';
+  return fetch(url).then(r => r.json()).catch(() => ({ data:[], total_vendas:0, receita_total:0 }));
+}
+
+// Criativos calculados localmente (sem chamada extra)
+async function carregaCriativos() {
+  const el = document.getElementById('cri-content');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div><div class="lt">Analisando criativos...</div></div>';
+  try {
+    // Agrega os ads já carregados
+    const account = document.getElementById('f-conta').value;
+    const source  = account === 'all' ? ST.ads : ST.ads.filter(a => a.conta === account);
+    const map = {};
+    for (const ad of source) {
+      const key = limpaNome(ad.nome);
+      if (!map[key]) map[key] = { nome:key, ads:0, gasto:0, cliques:0, impressoes:0, compras:0, leads:0, alcance:0, receita:0, thumb:'', urls:[] };
+      const c = map[key];
+      c.ads++; c.gasto+=ad.gasto||0; c.cliques+=ad.cliques||0; c.impressoes+=ad.impressoes||0;
+      c.compras+=ad.compras||0; c.leads+=ad.leads||0; c.alcance+=ad.alcance||0; c.receita+=ad.receita||0;
+      if (!c.thumb && ad.thumb) c.thumb = ad.thumb;
+      if (ad.url) c.urls.push(ad.url);
+    }
+    ST.criativos = Object.values(map).map(c => {
+      c.ctr  = c.impressoes > 0 ? +(c.cliques/c.impressoes*100).toFixed(2) : 0;
+      c.cpc  = c.cliques    > 0 ? +(c.gasto/c.cliques).toFixed(2)          : 0;
+      c.cpl  = c.leads      > 0 ? +(c.gasto/c.leads).toFixed(2)            : 0;
+      c.cpa  = c.compras    > 0 ? +(c.gasto/c.compras).toFixed(2)          : 0;
+      c.roas = c.receita > 0 && c.gasto > 0 ? +(c.receita/c.gasto).toFixed(2) : 0;
+      c.score = calcScore(c); c.insights = calcInsights(c);
+      return c;
+    }).sort((a,b) => b.cliques - a.cliques);
+    ST.criativos_loaded = true;
+    renderCriativos();
+  } catch(e) {
+    el.innerHTML = '<div class="empty"><div class="empty-ic">⚠️</div>' + e.message + '</div>';
+  }
+}
+
+function detectaLote(nome) {
+  if (!nome) return 'Sem Lote';
+  const m = nome.match(/lote[_\-\s]*0*(\d+)/i);
+  return m ? 'Lote ' + m[1] : 'Sem Lote';
+}
+
+function limpaNome(n) {
+  if (!n) return 'Desconhecido';
+  return n.replace(/[-_](Samuel|Ana|Pedro|Joao|João|Maria|Teste\d*|Teatro|Celular|AllType|Desktop|Mobile|Alphaville)$/i,'')
+          .replace(/\s*\d{4}-\d{2}-\d{2}.*/,'').replace(/\s*copy\s*\d*$/i,'').trim() || n;
+}
+
+function calcScore(c) {
+  let s = 0;
+  if (c.compras > 0)           s += 40;
+  if (c.leads > 0)             s += 20;
+  if (c.ctr > 2)               s += 20;
+  if (c.cpc > 0 && c.cpc < 3) s += 10;
+  if (c.cliques > 500)         s += 10;
+  return Math.min(s, 100);
+}
+
+function calcInsights(c) {
+  const i = [];
+  if (c.ctr > 3)                          i.push('✅ CTR alto — bom hook/thumbnail');
+  else if (c.ctr < 1 && c.impressoes>500) i.push('⚠️ CTR baixo — revisar criativo');
+  if (c.cpc > 0 && c.cpc < 2)            i.push('✅ CPC eficiente (R$'+c.cpc+')');
+  else if (c.cpc > 6)                     i.push('⚠️ CPC alto');
+  if (c.compras > 5)                      i.push('✅ '+c.compras+' compras');
+  if (c.leads > 100)                      i.push('✅ '+c.leads+' leads');
+  if (c.roas > 2)                         i.push('✅ ROAS '+c.roas+'x');
+  if (c.gasto > 3000 && c.compras===0 && c.leads===0) i.push('🚨 Alto gasto sem conversões');
+  return i.length ? i : ['📊 Acumule mais dados'];
 }
 
 // ============================================================
