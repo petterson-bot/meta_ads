@@ -414,12 +414,15 @@ async function carrega() {
     const comR = await gas('comercial', {});
     const comD = comR || {};
     ST.comercial = {
-      data:    Array.isArray(comD.data) ? comD.data : [],
-      total:   comD.total   || 0,
-      receita: comD.receita || 0,
-      col:     comD.col_valor || null,
-      error:   comD.error   || null,
-      abas:    comD.abas    || []
+      data:       Array.isArray(comD.data) ? comD.data : [],
+      total:      comD.total      || 0,
+      receita:    comD.receita    || 0,
+      por_lote:   Array.isArray(comD.por_lote) ? comD.por_lote : [],
+      col_valor:  comD.col_valor  || null,
+      col_lote:   comD.col_lote   || null,
+      sheet_nome: comD.sheet_nome || 'Compras',
+      error:      comD.error      || null,
+      abas:       comD.abas       || []
     };
 
     // Badge comercial
@@ -430,7 +433,7 @@ async function carrega() {
         badge.textContent = '⚠️ Comercial';
       } else if (ST.comercial.total > 0) {
         badge.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(29,218,138,.1);color:var(--grn);border:1px solid rgba(29,218,138,.25)';
-        badge.textContent = '📋 ' + ST.comercial.total + ' vendas';
+        badge.textContent = '📋 ' + N(ST.comercial.total) + ' vendas · ' + R$(ST.comercial.receita);
       } else {
         badge.style.display = 'none';
       }
@@ -678,30 +681,64 @@ function renderCom() {
   const el = document.getElementById('com-content');
 
   if (c.error && !c.data.length) {
-    const abasHtml = c.abas.length
-      ? '<div style="margin-top:8px;font-size:12px">Abas: ' +
-        c.abas.map(a=>`<button onclick="selecionaAba('${esc(a)}')" style="background:var(--surf2);border:1px solid var(--brd2);color:var(--acc2);padding:2px 8px;border-radius:4px;font-size:11px;cursor:pointer;margin:2px">${esc(a)}</button>`).join('') +
+    const abasHtml = c.abas && c.abas.length
+      ? '<div style="margin-top:10px;font-size:12px;color:var(--txt2)">Abas disponíveis: ' +
+        c.abas.map(a=>`<button onclick="salvaAba_nome('${esc(a)}')" style="background:var(--surf2);border:1px solid var(--brd2);color:var(--acc2);padding:2px 8px;border-radius:4px;font-size:11px;cursor:pointer;margin:2px">${esc(a)}</button>`).join('') +
         '</div>' : '';
-    el.innerHTML = `<div class="empty"><div class="empty-ic">⚠️</div><div>${esc(c.error)}</div>${abasHtml}</div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-ic">⚠️</div><div style="margin-bottom:6px">${esc(c.error)}</div>${abasHtml}</div>`;
     return;
   }
 
   const gastoMeta = soma(filtra()).gasto;
   const roi  = gastoMeta>0&&c.receita>0 ? ((c.receita-gastoMeta)/gastoMeta*100).toFixed(1) : 0;
   const roas = gastoMeta>0&&c.receita>0 ? (c.receita/gastoMeta).toFixed(2) : 0;
-  const hdrs = c.data.length ? Object.keys(c.data[0]).slice(0,8) : [];
+
+  // Tabela por lote
+  const porLote = c.por_lote || [];
+  const loteTable = porLote.length ? `
+    <div style="font-size:12px;font-weight:600;margin:18px 0 10px">Vendas por Lote</div>
+    <div class="tw"><table>
+      <thead><tr><th>Lote</th><th>Vendas</th><th>Receita</th><th>Ticket Médio</th></tr></thead>
+      <tbody>
+        ${porLote.sort((a,b)=>b.receita-a.receita).map(l=>`<tr>
+          <td><span class="lote-b">${esc(l.lote||'Sem Lote')}</span></td>
+          <td><span class="mn">${N(l.total)}</span></td>
+          <td><span class="mn g">${R$(l.receita)}</span></td>
+          <td><span class="mn">${l.total>0?R$(l.receita/l.total):'—'}</span></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>` : '';
+
+  // Tabela de vendas
+  const vendas = c.data || [];
+  const vendasTable = vendas.length ? `
+    <div style="font-size:12px;font-weight:600;margin:18px 0 10px">Últimas Vendas <span style="font-weight:400;color:var(--txt2)">(${Math.min(vendas.length,50)} de ${vendas.length})</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>Nome</th><th>E-mail</th><th>Valor</th><th>Qtd</th><th>Lote</th><th>Data</th></tr></thead>
+      <tbody>${vendas.slice(0,50).map(v=>`<tr>
+        <td>${esc(v.nome||'—')}</td>
+        <td style="font-size:11px;color:var(--txt2)">${esc(v.email||'—')}</td>
+        <td><span class="mn g">${R$(v.valor)}</span></td>
+        <td><span class="mn">${v.qtd||1}</span></td>
+        <td>${v.lote?`<span class="lote-b">${esc(v.lote)}</span>`:'—'}</td>
+        <td style="font-size:11px;color:var(--txt2)">${esc(v.data||'')}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>` : '<div class="empty"><div class="empty-ic">📋</div>Nenhuma venda encontrada.</div>';
 
   el.innerHTML = `
+    <div style="font-size:11px;color:var(--txt2);margin-bottom:14px">
+      Planilha: <strong>Comercial SDA 2026</strong> · Aba: <strong>${esc(c.sheet_nome||'Compras')}</strong>
+      ${c.col_valor?` · Valor: col. ${esc(c.col_valor)}`:''}
+      ${c.col_lote ?` · Lote: col. ${esc(c.col_lote)}`:''}
+    </div>
     <div class="com-cards">
-      <div class="card grn"><div class="clbl">Vendas</div><div class="cval">${N(c.total)}</div></div>
-      <div class="card acc"><div class="clbl">Receita</div><div class="cval">${R$(c.receita)}</div></div>
+      <div class="card grn"><div class="clbl">Total de Vendas</div><div class="cval">${N(c.total)}</div><div class="csub">na planilha</div></div>
+      <div class="card acc"><div class="clbl">Receita Total</div><div class="cval">${R$(c.receita)}</div></div>
       <div class="card amb"><div class="clbl">Ticket Médio</div><div class="cval">${c.total>0?R$(c.receita/c.total):'—'}</div></div>
       <div class="card ${parseFloat(roi)>=0?'grn':'red'}"><div class="clbl">ROI</div><div class="cval">${roi}%</div><div class="csub">ROAS ${roas}×</div></div>
     </div>
-    ${c.data.length?`<div class="tw"><table>
-      <thead><tr>${hdrs.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead>
-      <tbody>${c.data.slice(0,50).map(r=>`<tr>${hdrs.map(h=>`<td>${esc(String(r[h]||''))}</td>`).join('')}</tr>`).join('')}</tbody>
-    </table></div>`:'<div class="empty"><div class="empty-ic">📋</div>Nenhum dado de compra.</div>'}`;
+    ${loteTable}
+    ${vendasTable}`;
 }
 
 // CRIATIVOS — calculados localmente dos ads carregados
@@ -843,18 +880,8 @@ async function salvaUrl() {
 async function salvaAba() {
   const nome = document.getElementById('m-sheets').value;
   if (!nome) return;
-  try {
-    await gas('setSheet', { name: nome });
-    localStorage.setItem('meta_dash_sheet', nome);
-    toast('Aba "' + nome + '" configurada', 'ok');
-    checaConexao();
-    // Recarrega comercial
-    const comR = await gas('comercial', {});
-    const comD = comR || {};
-    ST.comercial = { data:Array.isArray(comD.data)?comD.data:[], total:comD.total||0, receita:comD.receita||0, col:comD.col_valor||null, error:comD.error||null, abas:comD.abas||[] };
-    renderCom();
-    renderCards(filtra());
-  } catch(e) { toast('Erro: '+e.message,'err'); }
+  await salvaAba_nome(nome);
+  checaConexao();
 }
 
 async function selecionaAba(nome) {
@@ -865,11 +892,26 @@ async function salvaAba_nome(nome) {
   try {
     await gas('setSheet', { name: nome });
     localStorage.setItem('meta_dash_sheet', nome);
-    toast('Aba "'+nome+'" configurada','ok');
+    toast('Aba "'+nome+'" configurada ✓','ok');
     const comR = await gas('comercial', {});
     const comD = comR || {};
-    ST.comercial = { data:Array.isArray(comD.data)?comD.data:[], total:comD.total||0, receita:comD.receita||0, col:comD.col_valor||null, error:comD.error||null, abas:comD.abas||[] };
+    ST.comercial = {
+      data:       Array.isArray(comD.data) ? comD.data : [],
+      total:      comD.total      || 0,
+      receita:    comD.receita    || 0,
+      por_lote:   Array.isArray(comD.por_lote) ? comD.por_lote : [],
+      col_valor:  comD.col_valor  || null,
+      col_lote:   comD.col_lote   || null,
+      sheet_nome: comD.sheet_nome || nome,
+      error:      comD.error      || null,
+      abas:       comD.abas       || []
+    };
     renderCom(); renderCards(filtra());
+    const b = document.getElementById('gas-badge');
+    if (b && ST.comercial.total > 0) {
+      b.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(29,218,138,.1);color:var(--grn);border:1px solid rgba(29,218,138,.25)';
+      b.textContent = '📋 ' + N(ST.comercial.total) + ' vendas · ' + R$(ST.comercial.receita);
+    }
   } catch(e) { toast('Erro: '+e.message,'err'); }
 }
 
